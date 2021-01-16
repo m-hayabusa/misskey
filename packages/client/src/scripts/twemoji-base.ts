@@ -1,4 +1,4 @@
-export const twemojiSvgBase = '/twemoji';
+export const twemojiSvgBase = 'https://emoji.mewl.me/blobmoji';
 
 export function char2fileName(char: string): string {
 	let codes = Array.from(char).map(x => x.codePointAt(0)?.toString(16));
