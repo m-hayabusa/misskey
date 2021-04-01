@@ -4,9 +4,10 @@ import { Note } from '@/models/entities/note.js';
 import { Emojis } from '@/models/index.js';
 import { IsNull } from 'typeorm';
 import renderEmoji from './emoji.js';
+import { blobize } from '@/misc/blobize.js';
 
 export const renderLike = async (noteReaction: NoteReaction, note: Note) => {
-	const reaction = noteReaction.reaction;
+	const reaction = blobize(noteReaction.reaction);
 
 	const object = {
 		type: 'Like',
