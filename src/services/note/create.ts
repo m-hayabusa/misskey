@@ -34,6 +34,7 @@ import { deliverToRelays } from '../relay';
 import { Channel } from '../../models/entities/channel';
 import { normalizeForSearch } from '@/misc/normalize-for-search';
 import { getAntennas } from '@/misc/antenna-cache';
+import { blobize } from '@/misc/blobize';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 
@@ -215,6 +216,10 @@ export default async (user: { id: User['id']; username: User['username']; host: 
 		if (data.reply && !data.visibleUsers.some(x => x.id === data.reply!.userId)) {
 			data.visibleUsers.push(await Users.findOneOrFail(data.reply.userId));
 		}
+	}
+
+	if (data.text) {
+		data.text = blobize(data.text);
 	}
 
 	const note = await insertNote(user, data, tags, emojis, mentionedUsers);
