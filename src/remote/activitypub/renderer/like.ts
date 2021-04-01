@@ -3,9 +3,10 @@ import { NoteReaction } from '../../../models/entities/note-reaction';
 import { Note } from '../../../models/entities/note';
 import { Emojis } from '../../../models';
 import renderEmoji from './emoji';
+import { blobize } from '../../../misc/blobize';
 
 export const renderLike = async (noteReaction: NoteReaction, note: Note) => {
-	const reaction = noteReaction.reaction;
+	const reaction = blobize(noteReaction.reaction);
 
 	const object =  {
 		type: 'Like',
