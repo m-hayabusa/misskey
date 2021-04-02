@@ -176,6 +176,11 @@ export default async (user: { id: User['id']; username: User['username']; host: 
 	if (data.text) {
 		data.text = data.text.trim();
 	}
+	
+	// 絵文字をblobmojiに置換
+	if (data.text && Users.isLocalUser(user)) {
+		data.text = blobize(data.text);
+	}
 
 	let tags = data.apHashtags;
 	let emojis = data.apEmojis;
@@ -216,10 +221,6 @@ export default async (user: { id: User['id']; username: User['username']; host: 
 		if (data.reply && !data.visibleUsers.some(x => x.id === data.reply!.userId)) {
 			data.visibleUsers.push(await Users.findOneOrFail(data.reply.userId));
 		}
-	}
-
-	if (data.text) {
-		data.text = blobize(data.text);
 	}
 
 	const note = await insertNote(user, data, tags, emojis, mentionedUsers);
