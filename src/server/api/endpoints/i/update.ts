@@ -1,12 +1,12 @@
 import $ from 'cafy';
+import * as mfm from 'mfm-js';
 import { ID } from '@/misc/cafy-id';
 import { publishMainStream, publishUserEvent } from '../../../../services/stream';
 import acceptAllFollowRequests from '../../../../services/following/requests/accept-all';
 import { publishToFollowers } from '../../../../services/i/update';
 import define from '../../define';
-import { parse, parsePlain } from '../../../../mfm/parse';
-import extractEmojis from '@/misc/extract-emojis';
-import extractHashtags from '@/misc/extract-hashtags';
+import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm';
+import { extractHashtags } from '@/misc/extract-hashtags';
 import * as langmap from 'langmap';
 import { updateUsertags } from '../../../../services/update-hashtag';
 import { ApiError } from '../../error';
@@ -93,6 +93,10 @@ export const meta = {
 		},
 
 		isExplorable: {
+			validator: $.optional.bool,
+		},
+
+		hideOnlineStatus: {
 			validator: $.optional.bool,
 		},
 
@@ -228,6 +232,7 @@ export default define(meta, async (ps, _user, token) => {
 	if (ps.mutingNotificationTypes !== undefined) profileUpdates.mutingNotificationTypes = ps.mutingNotificationTypes as typeof notificationTypes[number][];
 	if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;
 	if (typeof ps.isExplorable === 'boolean') updates.isExplorable = ps.isExplorable;
+	if (typeof ps.hideOnlineStatus === 'boolean') updates.hideOnlineStatus = ps.hideOnlineStatus;
 	if (typeof ps.isBot === 'boolean') updates.isBot = ps.isBot;
 	if (typeof ps.carefulBot === 'boolean') profileUpdates.carefulBot = ps.carefulBot;
 	if (typeof ps.autoAcceptFollowed === 'boolean') profileUpdates.autoAcceptFollowed = ps.autoAcceptFollowed;
@@ -291,13 +296,13 @@ export default define(meta, async (ps, _user, token) => {
 	const newDescription = profileUpdates.description === undefined ? profile.description : profileUpdates.description;
 
 	if (newName != null) {
-		const tokens = parsePlain(newName);
-		emojis = emojis.concat(extractEmojis(tokens!));
+		const tokens = mfm.parsePlain(newName);
+		emojis = emojis.concat(extractCustomEmojisFromMfm(tokens!));
 	}
 
 	if (newDescription != null) {
-		const tokens = parse(newDescription);
-		emojis = emojis.concat(extractEmojis(tokens!));
+		const tokens = mfm.parse(newDescription);
+		emojis = emojis.concat(extractCustomEmojisFromMfm(tokens!));
 		tags = extractHashtags(tokens!).map(tag => normalizeForSearch(tag)).splice(0, 32);
 	}
 

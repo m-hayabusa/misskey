@@ -27,7 +27,7 @@ import { faExclamationTriangle, faEyeSlash } from '@fortawesome/free-solid-svg-i
 import { getStaticImageUrl } from '@client/scripts/get-static-image-url';
 import { extractAvgColorFromBlurhash } from '@client/scripts/extract-avg-color-from-blurhash';
 import ImageViewer from './image-viewer.vue';
-import ImgWithBlurhash from './img-with-blurhash.vue';
+import ImgWithBlurhash from '@client/components/img-with-blurhash.vue';
 import * as os from '@client/os';
 
 export default defineComponent({
@@ -123,7 +123,7 @@ export default defineComponent({
 
 .gqnyydlz {
 	position: relative;
-	border: solid 1px var(--divider);
+	border: solid 0.5px var(--divider);
 
 	> i {
 		display: block;

@@ -9,7 +9,7 @@
 		</template>
 		<template #default="{items}">
 			<div class="user _panel" v-for="req in items" :key="req.id">
-				<MkAvatar class="avatar" :user="req.follower"/>
+				<MkAvatar class="avatar" :user="req.follower" :show-indicator="true"/>
 				<div class="body">
 					<div class="name">
 						<MkA class="name" :to="userPage(req.follower)" v-user-preview="req.follower.id"><MkUserName :user="req.follower"/></MkA>
@@ -35,6 +35,7 @@ import { faUserClock, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons
 import MkPagination from '@client/components/ui/pagination.vue';
 import { userPage, acct } from '../filters/user';
 import * as os from '@client/os';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -43,7 +44,7 @@ export default defineComponent({
 
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: this.$ts.followRequests,
 				icon: faUserClock,
 			},
