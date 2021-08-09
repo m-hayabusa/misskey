@@ -2,7 +2,7 @@
 <div class="vjoppmmu">
 	<template v-if="edit">
 		<header>
-			<MkSelect v-model:value="widgetAdderSelected" style="margin-bottom: var(--margin)">
+			<MkSelect v-model="widgetAdderSelected" style="margin-bottom: var(--margin)">
 				<template #label>{{ $ts.selectWidget }}</template>
 				<option v-for="widget in widgetDefs" :value="widget" :key="widget">{{ $t(`_widgets.${widget}`) }}</option>
 			</MkSelect>
@@ -43,6 +43,7 @@ export default defineComponent({
 
 	props: {
 		widgets: {
+			type: Array,
 			required: true,
 		},
 		edit: {

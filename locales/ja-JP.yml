@@ -128,6 +128,7 @@ editWidgets: "ウィジェットを編集"
 editWidgetsExit: "編集を終了"
 customEmojis: "カスタム絵文字"
 emoji: "絵文字"
+emojis: "絵文字"
 emojiName: "絵文字名"
 emojiUrl: "絵文字画像URL"
 addEmoji: "絵文字を追加"
@@ -528,7 +529,7 @@ removeAllFollowing: "フォローを全解除"
 removeAllFollowingDescription: "{host}からのフォローをすべて解除します。そのインスタンスがもう存在しなくなった場合などに実行してください。"
 userSuspended: "このユーザーは凍結されています。"
 userSilenced: "このユーザーはサイレンスされています。"
-sidebar: "サイドバー"
+menu: "メニュー"
 divider: "分割線"
 addItem: "項目を追加"
 rooms: "ルーム"
@@ -761,6 +762,22 @@ middle: "中"
 low: "低"
 emailNotConfiguredWarning: "メールアドレスの設定がされていません。"
 ratio: "比率"
+customCss: "カスタムCSS"
+customCssWarn: "この設定は必ず知識のある方が行ってください。不適切な設定を行うとクライアントが正常に使用できなくなる恐れがあります。"
+global: "グローバル"
+squareAvatars: "アイコンを四角形で表示"
+sent: "送信"
+received: "受信"
+searchResult: "検索結果"
+hashtags: "ハッシュタグ"
+troubleshooting: "トラブルシューティング"
+
+_docs: 
+  continueReading: "続きを読む"
+  features: "機能"
+  generalTopics: "一般的なトピック"
+  advancedTopics: "高度なトピック"
+  admin: "管理"
 
 _ad:
   back: "戻る"
@@ -868,6 +885,8 @@ _mfm:
   blurDescription: "内容をぼかすことができます。ポインターを上に乗せるとはっきり見えるようになります。"
   font: "フォント"
   fontDescription: "内容のフォントを指定することができます。"
+  rainbow: "レインボー"
+  rainbowDescription: "内容をレインボーにします。"
 
 _reversi:
   reversi: "リバーシ"
@@ -924,9 +943,10 @@ _channel:
   usersCount: "{n}人が参加中"
   notesCount: "{n}投稿があります"
 
-_sidebar:
-  full: "フル"
-  icon: "アイコン"
+_menuDisplay:
+  sideFull: "横"
+  sideIcon: "横(アイコン)"
+  top: "上部"
   hide: "隠す"
 
 _wordMute:
