@@ -1,11 +1,11 @@
 {
 	"name": "misskey",
 	"author": "syuilo <syuilotan@yahoo.co.jp>",
-	"version": "12.85.1",
+	"version": "12.85.1-mewl",
 	"codename": "indigo",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/misskey-dev/misskey.git"
+		"url": "https://github.com/m-hayabusa/misskey.git"
 	},
 	"main": "./index.js",
 	"private": true,
