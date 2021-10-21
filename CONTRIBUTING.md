@@ -1,41 +1,43 @@
 # Contribution guide
-**[✨ English version available](/docs/CONTRIBUTING.en.md)**
+We're glad you're interested in contributing Misskey! In this document you will find the information you need to contribute to the project.
 
-プロジェクトに興味を持っていただきありがとうございます！ このドキュメントでは、プロジェクトに貢献する際に必要な情報をまとめています。
+**ℹ️ Important:** This project uses Japanese as its major language, **but you do not need to translate and write the Issues/PRs in Japanese.**
+Also, you might receive comments on your Issue/PR in Japanese, but you do not need to reply to them in Japanese as well.\
+The accuracy of translation into Japanese is not high, so it will be easier for us to understand if you write it in the original language.
+It will also allow the reader to use the translation tool of their preference if necessary.
 
 ## Issues
-Issueを作成する前に、以下をご確認ください:
-- 重複を防ぐため、既に同様の内容のIssueが作成されていないか検索してから新しいIssueを作ってください。
-- Issueを質問に使わないでください。
-	- Issueは、要望、提案、問題の報告にのみ使用してください。
-	- 質問は、[Misskey Forum](https://forum.misskey.io/)や[Discord](https://discord.gg/Wp8gVStHW3)でお願いします。
+Before creating an issue, please check the following:
+- To avoid duplication, please search for similar issues before creating a new issue.
+- Do not use Issues as a question.
+	- Issues should only be used to feature requests, suggestions, and report problems.
+	- Please ask questions in the [Misskey Forum](https://forum.misskey.io/) or [Discord](https://discord.gg/Wp8gVStHW3).
 
-## 実装をする前に
-機能追加やバグ修正をしたいときは、まずIssueで設計、方針をレビューしてもらいましょう(無い場合は作ってください)。このステップがないと、せっかく実装してもPRがマージされない可能性が高くなります。
+## Before implementation
+When you want to add a feature or fix a bug, **first have the design and policy reviewed in an Issue** (if it is not there, please make one). Without this step, there is a high possibility that the PR will not be merged even if it is implemented.
 
-また、実装に取り掛かるときは当該Issueに自分をアサインしてください(自分でできない場合は他メンバーに自分をアサインしてもらうようお願いしてください)。
-自分が実装するという意思表示をすることで、作業がバッティングするのを防ぎます。
+Also, when you start implementation, assign yourself to the Issue (if you cannot do it yourself, ask another member to assign you). By expressing your intention to work the Issue, you can prevent conflicts in the work.
 
-## PRの作成
-PRありがとうございます！ PRを作成する前に、以下をご確認ください:
-- 可能であればタイトルに、以下で示すようなPRの種類が分かるキーワードをプリフィクスしてください。
-  - `fix` / `refactor` / `feat` / `enhance` / `perf` / `chore` など
-  - また、PRの粒度が適切であることを確認してください。ひとつのPRに複数の種類の変更や関心を含めることは避けてください。
-- このPRによって解決されるIssueがある場合は、そのIssueへの参照を本文内に含めてください。
-- [`CHANGELOG.md`](/CHANGELOG.md)に変更点を追記してください。リファクタリングなど、利用者に影響を与えない変更についてはこの限りではありません。
-- この変更により新たに作成、もしくは更新すべきドキュメントがないか確認してください。
-- 機能追加やバグ修正をした場合は、可能であればテストケースを追加してください。
-- テスト、Lintが通っていることを予め確認してください。
-  - `npm run test`、`npm run lint`でぞれぞれ実施可能です。[詳細](#testing)
-- UIに変更がある場合はスクリーンショットを本文内に添付してください。
-
-ご協力ありがとうございます🤗
-
-## ブランチ
+## Well-known branches
 - **`master`** branch is tracking the latest release and used for production purposes.
 - **`develop`** branch is where we work for the next release.
-	- PRを作成するときは、基本的にこのブランチに向けてください。
+	- When you create a PR, basically target it to this branch.
 - **`l10n_develop`** branch is reserved for localization management.
+
+## Creating a PR
+Thank you for your PR! Before creating a PR, please check the following:
+- If possible, prefix the title with a keyword that identifies the type of this PR, as shown below.
+  - `fix` / `refactor` / `feat` / `enhance` / `perf` / `chore` etc
+  - Also, make sure that the granularity of this PR is appropriate. Please do not include more than one type of change or interest in a single PR.
+- If there is an Issue which will be resolved by this PR, please include a reference to the Issue in the text.
+- Please add the summary of the changes to [`CHANGELOG.md`](/CHANGELOG.md). However, this is not necessary for changes that do not affect the users, such as refactoring.
+- Check if there are any documents that need to be created or updated due to this change.
+- If you have added a feature or fixed a bug, please add a test case if possible.
+- Please make sure that tests and Lint are passed in advance.
+  - You can run it with `npm run test` and `npm run lint`. [See more info](#testing)
+- If this PR includes UI changes, please attach a screenshot in the text.
+
+Thanks for your cooperation 🤗
 
 ## Localization (l10n)
 Misskey uses [Crowdin](https://crowdin.com/project/misskey) for localization management.
@@ -55,6 +57,17 @@ If your language is not listed in Crowdin, please open an issue.
 - Test codes are located in [`/test`](/test).
 
 ### Run test
+Create a config file.
+```
+cp test/test.yml .config/
+```
+Prepare DB/Redis for testing.
+```
+docker-compose -f test/docker-compose.yml up
+```
+Alternatively, prepare an empty (data can be erased) DB and edit `.config/test.yml`. 
+
+Run all test.
 ```
 npm run test
 ```
@@ -174,6 +187,10 @@ npx ts-node ./node_modules/typeorm/cli.js migration:generate -n 変更の名前
 
 ### JSONのimportに気を付けよう
 TypeScriptでjsonをimportすると、tscでコンパイルするときにそのjsonファイルも一緒にdistディレクトリに吐き出されてしまう。この挙動により、意図せずファイルの書き換えが発生することがあるので、jsonをimportするときは書き換えられても良いものかどうか確認すること。書き換えされて欲しくない場合は、importで読み込むのではなく、`fs.readFileSync`などの関数を使って読み込むようにすればよい。
+
+### コンポーネントのスタイル定義でmarginを持たせない
+コンポーネント自身がmarginを設定するのは問題の元となることはよく知られている
+marginはそのコンポーネントを使う側が設定する
 
 ## その他
 ### HTMLのクラス名で follow という単語は使わない
