@@ -1,1 +1,1 @@
-export const twemojiSvgBase = '/twemoji';
+export const twemojiSvgBase = 'https://emoji.mewl.me/blobmoji';

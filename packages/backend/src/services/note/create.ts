@@ -34,6 +34,7 @@ import { deliverToRelays } from '../relay';
 import { Channel } from '@/models/entities/channel';
 import { normalizeForSearch } from '@/misc/normalize-for-search';
 import { getAntennas } from '@/misc/antenna-cache';
+import { blobize } from '@/misc/blobize';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 
@@ -173,6 +174,12 @@ export default async (user: { id: User['id']; username: User['username']; host: 
 	if (data.text) {
 		data.text = data.text.trim();
 	}
+	
+	// 絵文字をblobmojiに置換
+	if (data.text && Users.isLocalUser(user)) {
+		data.text = blobize(data.text);
+	}
+
 
 	let tags = data.apHashtags;
 	let emojis = data.apEmojis;
