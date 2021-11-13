@@ -9,9 +9,9 @@ It will also allow the reader to use the translation tool of their preference if
 ## Issues
 Before creating an issue, please check the following:
 - To avoid duplication, please search for similar issues before creating a new issue.
-- Do not use Issues as a question.
-	- Issues should only be used to feature requests, suggestions, and report problems.
-	- Please ask questions in the [Misskey Forum](https://forum.misskey.io/) or [Discord](https://discord.gg/Wp8gVStHW3).
+- Do not use Issues to ask questions or troubleshooting.
+	- Issues should only be used to feature requests, suggestions, and bug tracking.
+	- Please ask questions or troubleshooting in the [Misskey Forum](https://forum.misskey.io/) or [Discord](https://discord.gg/Wp8gVStHW3).
 
 ## Before implementation
 When you want to add a feature or fix a bug, **first have the design and policy reviewed in an Issue** (if it is not there, please make one). Without this step, there is a high possibility that the PR will not be merged even if it is implemented.
@@ -48,10 +48,6 @@ The owner [@syuilo](https://github.com/syuilo) merges the PR into the develop br
 If your language is not listed in Crowdin, please open an issue.
 
 ![Crowdin](https://d322cqt584bo4o.cloudfront.net/misskey/localized.svg)
-
-## Documentation
-* Documents for instance admins are located in [`/docs`](/docs).
-* Documents for end users are located in [`/src/docs`](/src/docs).
 
 ## Testing
 - Test codes are located in [`/test`](/test).
@@ -171,13 +167,16 @@ const users = userIds.length > 0 ? await Users.find({
 SQLでは配列のインデックスは**1始まり**。
 `[a, b, c]`の `a`にアクセスしたいなら`[0]`ではなく`[1]`と書く
 
+### null IN
+nullが含まれる可能性のあるカラムにINするときは、そのままだとおかしくなるのでORなどでnullのハンドリングをしよう。
+
 ### `undefined`にご用心
 MongoDBの時とは違い、findOneでレコードを取得する時に対象レコードが存在しない場合 **`undefined`** が返ってくるので注意。
 MongoDBは`null`で返してきてたので、その感覚で`if (x === null)`とか書くとバグる。代わりに`if (x == null)`と書いてください
 
 ### Migration作成方法
 ```
-npx ts-node ./node_modules/typeorm/cli.js migration:generate -n 変更の名前
+npx ts-node ./node_modules/typeorm/cli.js migration:generate -n 変更の名前 -o
 ```
 
 作成されたスクリプトは不必要な変更を含むため除去してください。
