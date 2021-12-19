@@ -19,7 +19,7 @@
 			</div>
 		</div>
 		<div class="_footer">
-			<MkButton @click="save()" primary><i class="fas fa-save"></i> {{ channelId ? $ts.save : $ts.create }}</MkButton>
+			<MkButton primary @click="save()"><i class="fas fa-save"></i> {{ channelId ? $ts.save : $ts.create }}</MkButton>
 		</div>
 	</div>
 </div>
@@ -112,7 +112,7 @@ export default defineComponent({
 		},
 
 		setBannerImage(e) {
-			selectFile(e.currentTarget || e.target, null, false).then(file => {
+			selectFile(e.currentTarget || e.target, null).then(file => {
 				this.bannerId = file.id;
 			});
 		},

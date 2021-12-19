@@ -19,18 +19,19 @@ export type FileInfo = {
 	};
 	width?: number;
 	height?: number;
+	orientation?: number;
 	blurhash?: string;
 	warnings: string[];
 };
 
 const TYPE_OCTET_STREAM = {
 	mime: 'application/octet-stream',
-	ext: null
+	ext: null,
 };
 
 const TYPE_SVG = {
 	mime: 'image/svg+xml',
-	ext: 'svg'
+	ext: 'svg',
 };
 
 /**
@@ -47,6 +48,7 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
 	// image dimensions
 	let width: number | undefined;
 	let height: number | undefined;
+	let orientation: number | undefined;
 
 	if (['image/jpeg', 'image/gif', 'image/png', 'image/apng', 'image/webp', 'image/bmp', 'image/tiff', 'image/svg+xml', 'image/vnd.adobe.photoshop'].includes(type.mime)) {
 		const imageSize = await detectImageSize(path).catch(e => {
@@ -61,6 +63,7 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
 		} else if (imageSize.wUnits === 'px') {
 			width = imageSize.width;
 			height = imageSize.height;
+			orientation = imageSize.orientation;
 
 			// 制限を超えている画像は octet-stream にする
 			if (imageSize.width > 16383 || imageSize.height > 16383) {
@@ -87,6 +90,7 @@ export async function getFileInfo(path: string): Promise<FileInfo> {
 		type,
 		width,
 		height,
+		orientation,
 		blurhash,
 		warnings,
 	};
@@ -112,7 +116,7 @@ export async function detectType(path: string) {
 
 		return {
 			mime: type.mime,
-			ext: type.ext
+			ext: type.ext,
 		};
 	}
 
@@ -163,6 +167,7 @@ async function detectImageSize(path: string): Promise<{
 	height: number;
 	wUnits: string;
 	hUnits: string;
+	orientation?: number;
 }> {
 	const readable = fs.createReadStream(path);
 	const imageSize = await probeImageSize(readable);

@@ -18,8 +18,6 @@ export const pendingApiRequestsCount = ref(0);
 let apiRequestsCount = 0; // for debug
 export const apiRequests = ref([]); // for debug
 
-export const windows = new Map();
-
 const apiClient = new Misskey.api.APIClient({
 	origin: url,
 });
@@ -103,7 +101,7 @@ export const apiWithDialog = ((
 ) => {
 	const promise = api(endpoint, data, token);
 	promiseDialog(promise, null, (e) => {
-		dialog({
+		alert({
 			type: 'error',
 			text: e.message + '\n' + (e as any).id,
 		});
@@ -136,7 +134,7 @@ export function promiseDialog<T extends Promise<any>>(
 		if (onFailure) {
 			onFailure(e);
 		} else {
-			dialog({
+			alert({
 				type: 'error',
 				text: e
 			});
@@ -164,6 +162,16 @@ export const popups = ref([]) as Ref<{
 	props: Record<string, any>;
 }[]>;
 
+const zIndexes = {
+	low: 1000000,
+	middle: 2000000,
+	high: 3000000,
+};
+export function claimZIndex(priority: 'low' | 'middle' | 'high' = 'low'): number {
+	zIndexes[priority] += 100;
+	return zIndexes[priority];
+}
+
 export async function popup(component: Component | typeof import('*.vue') | Promise<Component | typeof import('*.vue')>, props: Record<string, any>, events = {}, disposeEvent?: string) {
 	if (component.then) component = await component;
 
@@ -172,7 +180,6 @@ export async function popup(component: Component | typeof import('*.vue') | Prom
 
 	const id = ++popupIdCount;
 	const dispose = () => {
-		if (_DEV_) console.log('os:popup close', id, component, props, events);
 		// このsetTimeoutが無いと挙動がおかしくなる(autocompleteが閉じなくなる)。Vueのバグ？
 		setTimeout(() => {
 			popups.value = popups.value.filter(popup => popup.id !== id);
@@ -188,7 +195,6 @@ export async function popup(component: Component | typeof import('*.vue') | Prom
 		id,
 	};
 
-	if (_DEV_) console.log('os:popup open', id, component, props, events);
 	popups.value.push(state);
 
 	return {
@@ -214,13 +220,147 @@ export function modalPageWindow(path: string) {
 	}, {}, 'closed');
 }
 
-export function dialog(props: {
-	type: 'error' | 'info' | 'success' | 'warning' | 'waiting';
+export function toast(message: string) {
+	popup(import('@/components/toast.vue'), {
+		message
+	}, {}, 'closed');
+}
+
+export function alert(props: {
+	type?: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
 	title?: string | null;
 	text?: string | null;
-}) {
+}): Promise<void> {
 	return new Promise((resolve, reject) => {
 		popup(import('@/components/dialog.vue'), props, {
+			done: result => {
+				resolve();
+			},
+		}, 'closed');
+	});
+}
+
+export function confirm(props: {
+	type: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
+	title?: string | null;
+	text?: string | null;
+}): Promise<{ canceled: boolean }> {
+	return new Promise((resolve, reject) => {
+		popup(import('@/components/dialog.vue'), {
+			...props,
+			showCancelButton: true,
+		}, {
+			done: result => {
+				resolve(result ? result : { canceled: true });
+			},
+		}, 'closed');
+	});
+}
+
+export function inputText(props: {
+	type?: 'text' | 'email' | 'password' | 'url';
+	title?: string | null;
+	text?: string | null;
+	placeholder?: string | null;
+	default?: string | null;
+}): Promise<{ canceled: true; result: undefined; } | {
+	canceled: false; result: string;
+}> {
+	return new Promise((resolve, reject) => {
+		popup(import('@/components/dialog.vue'), {
+			title: props.title,
+			text: props.text,
+			input: {
+				type: props.type,
+				placeholder: props.placeholder,
+				default: props.default,
+			}
+		}, {
+			done: result => {
+				resolve(result ? result : { canceled: true });
+			},
+		}, 'closed');
+	});
+}
+
+export function inputNumber(props: {
+	title?: string | null;
+	text?: string | null;
+	placeholder?: string | null;
+	default?: number | null;
+}): Promise<{ canceled: true; result: undefined; } | {
+	canceled: false; result: number;
+}> {
+	return new Promise((resolve, reject) => {
+		popup(import('@/components/dialog.vue'), {
+			title: props.title,
+			text: props.text,
+			input: {
+				type: 'number',
+				placeholder: props.placeholder,
+				default: props.default,
+			}
+		}, {
+			done: result => {
+				resolve(result ? result : { canceled: true });
+			},
+		}, 'closed');
+	});
+}
+
+export function inputDate(props: {
+	title?: string | null;
+	text?: string | null;
+	placeholder?: string | null;
+	default?: Date | null;
+}): Promise<{ canceled: true; result: undefined; } | {
+	canceled: false; result: Date;
+}> {
+	return new Promise((resolve, reject) => {
+		popup(import('@/components/dialog.vue'), {
+			title: props.title,
+			text: props.text,
+			input: {
+				type: 'date',
+				placeholder: props.placeholder,
+				default: props.default,
+			}
+		}, {
+			done: result => {
+				resolve(result ? { result: new Date(result.result), canceled: false } : { canceled: true });
+			},
+		}, 'closed');
+	});
+}
+
+export function select(props: {
+	title?: string | null;
+	text?: string | null;
+	default?: string | null;
+	items?: {
+		value: string;
+		text: string;
+	}[];
+	groupedItems?: {
+		label: string;
+		items: {
+			value: string;
+			text: string;
+		}[];
+	}[];
+}): Promise<{ canceled: true; result: undefined; } | {
+	canceled: false; result: string;
+}> {
+	return new Promise((resolve, reject) => {
+		popup(import('@/components/dialog.vue'), {
+			title: props.title,
+			text: props.text,
+			select: {
+				items: props.items,
+				groupedItems: props.groupedItems,
+				default: props.default,
+			}
+		}, {
 			done: result => {
 				resolve(result ? result : { canceled: true });
 			},
@@ -414,7 +554,7 @@ export function contextMenu(items: any[], ev: MouseEvent) {
 	});
 }
 
-export function post(props: Record<string, any>) {
+export function post(props: Record<string, any> = {}) {
 	return new Promise((resolve, reject) => {
 		// NOTE: MkPostFormDialogをdynamic importするとiOSでテキストエリアに自動フォーカスできない
 		// NOTE: ただ、dynamic importしない場合、MkPostFormDialogインスタンスが使いまわされ、
@@ -435,13 +575,19 @@ export function post(props: Record<string, any>) {
 
 export const deckGlobalEvents = new EventEmitter();
 
-export const uploads = ref([]);
+export const uploads = ref<{
+	id: string;
+	name: string;
+	progressMax: number | undefined;
+	progressValue: number | undefined;
+	img: string;
+}[]>([]);
 
 export function upload(file: File, folder?: any, name?: string) {
 	if (folder && typeof folder == 'object') folder = folder.id;
 
 	return new Promise((resolve, reject) => {
-		const id = Math.random();
+		const id = Math.random().toString();
 
 		const reader = new FileReader();
 		reader.onload = (e) => {
@@ -465,8 +611,21 @@ export function upload(file: File, folder?: any, name?: string) {
 
 			const xhr = new XMLHttpRequest();
 			xhr.open('POST', apiUrl + '/drive/files/create', true);
-			xhr.onload = (e: any) => {
-				const driveFile = JSON.parse(e.target.response);
+			xhr.onload = (ev) => {
+				if (ev.target == null || ev.target.response == null) {
+					// TODO: 消すのではなくて再送できるようにしたい
+					uploads.value = uploads.value.filter(x => x.id != id);
+
+					alert({
+						type: 'error',
+						text: 'upload failed'
+					});
+
+					reject();
+					return;
+				}
+
+				const driveFile = JSON.parse(ev.target.response);
 
 				resolve(driveFile);
 

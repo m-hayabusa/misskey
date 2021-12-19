@@ -42,7 +42,7 @@ router.get('/disconnect/github', async ctx => {
 
 	const user = await Users.findOneOrFail({
 		host: null,
-		token: userToken
+		token: userToken,
 	});
 
 	const profile = await UserProfiles.findOneOrFail(user.id);
@@ -58,7 +58,7 @@ router.get('/disconnect/github', async ctx => {
 	// Publish i updated event
 	publishMainStream(user.id, 'meUpdated', await Users.pack(user, user, {
 		detail: true,
-		includeSecrets: true
+		includeSecrets: true,
 	}));
 });
 
@@ -92,7 +92,7 @@ router.get('/connect/github', async ctx => {
 	const params = {
 		redirect_uri: `${config.url}/api/gh/cb`,
 		scope: ['read:user'],
-		state: uuid()
+		state: uuid(),
 	};
 
 	redisClient.set(userToken, JSON.stringify(params));
@@ -107,13 +107,13 @@ router.get('/signin/github', async ctx => {
 	const params = {
 		redirect_uri: `${config.url}/api/gh/cb`,
 		scope: ['read:user'],
-		state: uuid()
+		state: uuid(),
 	};
 
 	ctx.cookies.set('signin_with_github_sid', sessid, {
 		path: '/',
 		secure: config.url.startsWith('https'),
-		httpOnly: true
+		httpOnly: true,
 	});
 
 	redisClient.set(sessid, JSON.stringify(params));
@@ -155,7 +155,7 @@ router.get('/gh/cb', async ctx => {
 
 		const { accessToken } = await new Promise<any>((res, rej) =>
 			oauth2!.getOAuthAccessToken(code, {
-				redirect_uri
+				redirect_uri,
 			}, (err, accessToken, refresh, result) => {
 				if (err) {
 					rej(err);
@@ -167,7 +167,7 @@ router.get('/gh/cb', async ctx => {
 			}));
 
 		const { login, id } = await getJson('https://api.github.com/user', 'application/vnd.github.v3+json', 10 * 1000, {
-			'Authorization': `bearer ${accessToken}`
+			'Authorization': `bearer ${accessToken}`,
 		});
 		if (!login || !id) {
 			ctx.throw(400, 'invalid session');
@@ -209,16 +209,17 @@ router.get('/gh/cb', async ctx => {
 				code,
 				{ redirect_uri },
 				(err, accessToken, refresh, result) => {
-					if (err)
+					if (err) {
 						rej(err);
-					else if (result.error)
+					} else if (result.error) {
 						rej(result.error);
-					else
+					} else {
 						res({ accessToken });
+					}
 				}));
 
 		const { login, id } = await getJson('https://api.github.com/user', 'application/vnd.github.v3+json', 10 * 1000, {
-			'Authorization': `bearer ${accessToken}`
+			'Authorization': `bearer ${accessToken}`,
 		});
 
 		if (!login || !id) {
@@ -228,7 +229,7 @@ router.get('/gh/cb', async ctx => {
 
 		const user = await Users.findOneOrFail({
 			host: null,
-			token: userToken
+			token: userToken,
 		});
 
 		const profile = await UserProfiles.findOneOrFail(user.id);
@@ -240,8 +241,8 @@ router.get('/gh/cb', async ctx => {
 					accessToken: accessToken,
 					id: id,
 					login: login,
-				}
-			}
+				},
+			},
 		});
 
 		ctx.body = `GitHub: @${login} を、Misskey: @${user.username} に接続しました！`;
@@ -249,7 +250,7 @@ router.get('/gh/cb', async ctx => {
 		// Publish i updated event
 		publishMainStream(user.id, 'meUpdated', await Users.pack(user, user, {
 			detail: true,
-			includeSecrets: true
+			includeSecrets: true,
 		}));
 	}
 });

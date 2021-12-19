@@ -104,7 +104,6 @@ clickToShow: "Kliknij, aby wyświetlić"
 sensitive: "NSFW"
 add: "Dodaj"
 reaction: "Reakcja"
-reactionSettingDescription: "Przypisz swoje ulubione reakcje, które chcesz przypiąć w wyborze reakcji."
 reactionSettingDescription2: "Przeciągnij aby zmienić kolejność, naciśnij aby usunąć, naciśnij „+” aby dodać"
 rememberNoteVisibility: "Zapamiętuj ustawienia widoczności wpisu"
 attachCancel: "Usuń załącznik"
@@ -738,8 +737,9 @@ ratio: "Stosunek"
 global: "Globalna"
 sent: "Wyślij"
 hashtags: "Hashtag"
-_docs:
-  admin: "Zarządzanie"
+hide: "Ukryj"
+_ffVisibility:
+  public: "Publikuj"
 _ad:
   back: "Wróć"
   reduceFrequencyOfThisAd: "Pokazuj tę reklamę rzadziej"
@@ -815,6 +815,7 @@ _mfm:
   blur: "Rozmycie"
   font: "Czcionka"
   fontDescription: "Wybiera czcionkę do wyświetlania treści."
+  rotate: "Obróć"
 _reversi:
   reversi: "Reversi"
   gameSettings: "Ustawienia gry"

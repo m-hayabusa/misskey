@@ -66,7 +66,7 @@ class NotificationManager {
 		} else {
 			this.queue.push({
 				reason: reason,
-				target: notifiee
+				target: notifiee,
 			});
 		}
 	}
@@ -75,7 +75,7 @@ class NotificationManager {
 		for (const x of this.queue) {
 			// ミュート情報を取得
 			const mentioneeMutes = await Mutings.find({
-				muterId: x.target
+				muterId: x.target,
 			});
 
 			const mentioneesMutedUserIds = mentioneeMutes.map(m => m.muteeId);
@@ -84,7 +84,7 @@ class NotificationManager {
 			if (!mentioneesMutedUserIds.includes(this.notifier.id)) {
 				createNotification(x.target, x.reason, {
 					notifierId: this.notifier.id,
-					noteId: this.note.id
+					noteId: this.note.id,
 				});
 			}
 		}
@@ -249,7 +249,7 @@ export default async (user: { id: User['id']; username: User['username']; host: 
 	// Word mute
 	// TODO: cache
 	UserProfiles.find({
-		enableWordMute: true
+		enableWordMute: true,
 	}).then(us => {
 		for (const u of us) {
 			checkWordMute(note, { id: u.userId }, u.mutedWords).then(shouldMute => {
@@ -457,7 +457,7 @@ function incRenoteCount(renote: Note) {
 	Notes.createQueryBuilder().update()
 		.set({
 			renoteCount: () => '"renoteCount" + 1',
-			score: () => '"score" + 1'
+			score: () => '"score" + 1',
 		})
 		.where('id = :id', { id: renote.id })
 		.execute();
@@ -515,7 +515,7 @@ async function insertNote(user: { id: User['id']; host: User['host']; }, data: O
 				uri: u.uri,
 				url: url == null ? undefined : url,
 				username: u.username,
-				host: u.host
+				host: u.host,
 			} as IMentionedRemoteUsers[0];
 		}));
 	}
@@ -535,7 +535,7 @@ async function insertNote(user: { id: User['id']; host: User['host']; }, data: O
 					votes: new Array(data.poll!.choices.length).fill(0),
 					noteVisibility: insert.visibility,
 					userId: user.id,
-					userHost: user.host
+					userHost: user.host,
 				});
 
 				await transactionalEntityManager.insert(Poll, poll);
@@ -568,15 +568,15 @@ function index(note: Note) {
 		body: {
 			text: normalizeForSearch(note.text),
 			userId: note.userId,
-			userHost: note.userHost
-		}
+			userHost: note.userHost,
+		},
 	});
 }
 
 async function notifyToWatchersOfRenotee(renote: Note, user: { id: User['id']; }, nm: NotificationManager, type: NotificationType) {
 	const watchers = await NoteWatchings.find({
 		noteId: renote.id,
-		userId: Not(user.id)
+		userId: Not(user.id),
 	});
 
 	for (const watcher of watchers) {
@@ -587,7 +587,7 @@ async function notifyToWatchersOfRenotee(renote: Note, user: { id: User['id']; }
 async function notifyToWatchersOfReplyee(reply: Note, user: { id: User['id']; }, nm: NotificationManager) {
 	const watchers = await NoteWatchings.find({
 		noteId: reply.id,
-		userId: Not(user.id)
+		userId: Not(user.id),
 	});
 
 	for (const watcher of watchers) {
@@ -607,7 +607,7 @@ async function createMentionedEvents(mentionedUsers: User[], note: Note, nm: Not
 		}
 
 		const detailPackedNote = await Notes.pack(note, u, {
-			detail: true
+			detail: true,
 		});
 
 		publishMainStream(u.id, 'mention', detailPackedNote);
@@ -625,7 +625,7 @@ function incNotesCountOfUser(user: { id: User['id']; }) {
 	Users.createQueryBuilder().update()
 		.set({
 			updatedAt: new Date(),
-			notesCount: () => '"notesCount" + 1'
+			notesCount: () => '"notesCount" + 1',
 		})
 		.where('id = :id', { id: user.id })
 		.execute();

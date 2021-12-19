@@ -1,15 +1,15 @@
 <template>
-<div class="omfetrab" :class="['w' + width, 'h' + height, { big }]">
-	<input ref="search" class="search" data-prevent-emoji-insert :class="{ filled: q != null && q != '' }" v-model.trim="q" :placeholder="$ts.search" @paste.stop="paste" @keyup.enter="done()">
-	<div class="emojis" ref="emojis">
+<div class="omfetrab" :class="['w' + width, 'h' + height, { big, asDrawer }]" :style="{ maxHeight: maxHeight ? maxHeight + 'px' : null }">
+	<input ref="search" v-model.trim="q" class="search" data-prevent-emoji-insert :class="{ filled: q != null && q != '' }" :placeholder="$ts.search" @paste.stop="paste" @keyup.enter="done()">
+	<div ref="emojis" class="emojis">
 		<section class="result">
 			<div v-if="searchResultCustom.length > 0">
 				<button v-for="emoji in searchResultCustom"
+					:key="emoji"
 					class="_button"
 					:title="emoji.name"
-					@click="chosen(emoji, $event)"
-					:key="emoji"
 					tabindex="0"
+					@click="chosen(emoji, $event)"
 				>
 					<MkEmoji v-if="emoji.char != null" :emoji="emoji.char"/>
 					<img v-else :src="$store.state.disableShowingAnimatedImages ? getStaticImageUrl(emoji.url) : emoji.url"/>
@@ -17,25 +17,25 @@
 			</div>
 			<div v-if="searchResultUnicode.length > 0">
 				<button v-for="emoji in searchResultUnicode"
+					:key="emoji.name"
 					class="_button"
 					:title="emoji.name"
-					@click="chosen(emoji, $event)"
-					:key="emoji.name"
 					tabindex="0"
+					@click="chosen(emoji, $event)"
 				>
 					<MkEmoji :emoji="emoji.char"/>
 				</button>
 			</div>
 		</section>
 
-		<div class="index" v-if="tab === 'index'">
+		<div v-if="tab === 'index'" class="index">
 			<section v-if="showPinned">
 				<div>
 					<button v-for="emoji in pinned"
-						class="_button"
-						@click="chosen(emoji, $event)"
-						tabindex="0"
 						:key="emoji"
+						class="_button"
+						tabindex="0"
+						@click="chosen(emoji, $event)"
 					>
 						<MkEmoji :emoji="emoji" :normal="true"/>
 					</button>
@@ -46,9 +46,9 @@
 				<header class="_acrylic"><i class="far fa-clock fa-fw"></i> {{ $ts.recentUsed }}</header>
 				<div>
 					<button v-for="emoji in $store.state.recentlyUsedEmojis"
+						:key="emoji"
 						class="_button"
 						@click="chosen(emoji, $event)"
-						:key="emoji"
 					>
 						<MkEmoji :emoji="emoji" :normal="true"/>
 					</button>
@@ -79,7 +79,7 @@ import { emojilist } from '@/scripts/emojilist';
 import { getStaticImageUrl } from '@/scripts/get-static-image-url';
 import Particle from '@/components/particle.vue';
 import * as os from '@/os';
-import { isDeviceTouch } from '@/scripts/is-device-touch';
+import { isTouchUsing } from '@/scripts/touch';
 import { isMobile } from '@/scripts/is-mobile';
 import { emojiCategories } from '@/instance';
 import XSection from './emoji-picker.section.vue';
@@ -92,9 +92,17 @@ export default defineComponent({
 	props: {
 		showPinned: {
 			required: false,
-			default: true
+			default: true,
 		},
 		asReactionPicker: {
+			required: false,
+		},
+		maxHeight: {
+			type: Number,
+			required: false,
+		},
+		asDrawer: {
+			type: Boolean,
 			required: false
 		},
 	},
@@ -108,7 +116,7 @@ export default defineComponent({
 			pinned: this.$store.reactiveState.reactions,
 			width: this.asReactionPicker ? this.$store.state.reactionPickerWidth : 3,
 			height: this.asReactionPicker ? this.$store.state.reactionPickerHeight : 2,
-			big: this.asReactionPicker ? isDeviceTouch : false,
+			big: this.asReactionPicker ? isTouchUsing : false,
 			customEmojiCategories: emojiCategories,
 			customEmojis: this.$instance.emojis,
 			q: null,
@@ -268,7 +276,7 @@ export default defineComponent({
 
 	methods: {
 		focus() {
-			if (!isMobile && !isDeviceTouch) {
+			if (!isMobile && !isTouchUsing) {
 				this.$refs.search.focus({
 					preventScroll: true
 				});
@@ -353,26 +361,60 @@ export default defineComponent({
 
 	&.w1 {
 		width: calc((var(--eachSize) * 5) + (#{$pad} * 2));
+		--columns: 1fr 1fr 1fr 1fr 1fr;
 	}
 
 	&.w2 {
 		width: calc((var(--eachSize) * 6) + (#{$pad} * 2));
+		--columns: 1fr 1fr 1fr 1fr 1fr 1fr;
 	}
 
 	&.w3 {
 		width: calc((var(--eachSize) * 7) + (#{$pad} * 2));
+		--columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 	}
 
 	&.h1 {
-		--height: calc((var(--eachSize) * 4) + (#{$pad} * 2));
+		height: calc((var(--eachSize) * 4) + (#{$pad} * 2));
 	}
 
 	&.h2 {
-		--height: calc((var(--eachSize) * 6) + (#{$pad} * 2));
+		height: calc((var(--eachSize) * 6) + (#{$pad} * 2));
 	}
 
 	&.h3 {
-		--height: calc((var(--eachSize) * 8) + (#{$pad} * 2));
+		height: calc((var(--eachSize) * 8) + (#{$pad} * 2));
+	}
+
+	&.asDrawer {
+		width: 100% !important;
+
+		> .emojis {
+			::v-deep(section) {
+				> header {
+					height: 32px;
+					line-height: 32px;
+					padding: 0 12px;
+					font-size: 15px;
+				}
+
+				> div {
+					display: grid;
+					grid-template-columns: var(--columns);
+
+					> button {
+						aspect-ratio: 1 / 1;
+						width: auto;
+						height: auto;
+						min-width: 0;
+
+						> * {
+							font-size: 30px;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	> .search {
@@ -409,7 +451,7 @@ export default defineComponent({
 	}
 
 	> .emojis {
-		height: var(--height);
+		height: 100%;
 		overflow-y: auto;
 		overflow-x: hidden;
 

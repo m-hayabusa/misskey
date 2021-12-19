@@ -1,7 +1,7 @@
 <template>
-<component v-for="popup in popups"
+<component :is="popup.component"
+	v-for="popup in popups"
 	:key="popup.id"
-	:is="popup.component"
 	v-bind="popup.props"
 	v-on="popup.events"
 />
@@ -10,7 +10,7 @@
 
 <XStreamIndicator/>
 
-<div id="wait" v-if="pendingApiRequestsCount > 0"></div>
+<div v-if="pendingApiRequestsCount > 0" id="wait"></div>
 </template>
 
 <script lang="ts">
@@ -34,7 +34,7 @@ export default defineComponent({
 					id: notification.id
 				});
 
-				popup(import('@/components/toast.vue'), {
+				popup(import('@/components/notification-toast.vue'), {
 					notification
 				}, {}, 'closed');
 			}
@@ -60,7 +60,7 @@ export default defineComponent({
 #wait {
 	display: block;
 	position: fixed;
-	z-index: 10000;
+	z-index: 4000000;
 	top: 15px;
 	right: 15px;
 

@@ -7,12 +7,12 @@
 	<template v-if="!self">
 		<span class="schema">{{ schema }}//</span>
 		<span class="hostname">{{ hostname }}</span>
-		<span class="port" v-if="port != ''">:{{ port }}</span>
+		<span v-if="port != ''" class="port">:{{ port }}</span>
 	</template>
 	<template v-if="pathname === '/' && self">
 		<span class="self">{{ hostname }}</span>
 	</template>
-	<span class="pathname" v-if="pathname != ''">{{ self ? pathname.substr(1) : pathname }}</span>
+	<span v-if="pathname != ''" class="pathname">{{ self ? pathname.substr(1) : pathname }}</span>
 	<span class="query">{{ query }}</span>
 	<span class="hash">{{ hash }}</span>
 	<i v-if="target === '_blank'" class="fas fa-external-link-square-alt icon"></i>
@@ -23,7 +23,7 @@
 import { defineComponent } from 'vue';
 import { toUnicode as decodePunycode } from 'punycode/';
 import { url as local } from '@/config';
-import { isDeviceTouch } from '@/scripts/is-device-touch';
+import { isTouchUsing } from '@/scripts/touch';
 import * as os from '@/os';
 
 export default defineComponent({
@@ -91,13 +91,13 @@ export default defineComponent({
 			}
 		},
 		onMouseover() {
-			if (isDeviceTouch) return;
+			if (isTouchUsing) return;
 			clearTimeout(this.showTimer);
 			clearTimeout(this.hideTimer);
 			this.showTimer = setTimeout(this.showPreview, 500);
 		},
 		onMouseleave() {
-			if (isDeviceTouch) return;
+			if (isTouchUsing) return;
 			clearTimeout(this.showTimer);
 			clearTimeout(this.hideTimer);
 			this.hideTimer = setTimeout(this.closePreview, 500);

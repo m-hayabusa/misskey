@@ -1,15 +1,11 @@
 <template>
 <button
+	v-if="count > 0"
+	ref="buttonRef"
+	v-particle="canToggle"
 	class="hkzvhatu _button"
 	:class="{ reacted: note.myReaction == reaction, canToggle }"
 	@click="toggleReaction()"
-	v-if="count > 0"
-	@touchstart.passive="onMouseover"
-	@mouseover="onMouseover"
-	@mouseleave="onMouseleave"
-	@touchend="onMouseleave"
-	ref="buttonRef"
-	v-particle="canToggle"
 >
 	<XReactionIcon :reaction="reaction" :custom-emojis="note.emojis"/>
 	<span>{{ count }}</span>
@@ -90,16 +86,14 @@ export default defineComponent({
 			if (!props.isInitial) anime();
 		});
 
-		const { onMouseover, onMouseleave } = useTooltip(async (showing) => {
+		useTooltip(buttonRef, async (showing) => {
 			const reactions = await os.api('notes/reactions', {
 				noteId: props.note.id,
 				type: props.reaction,
 				limit: 11
 			});
 
-			const users = reactions
-				.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-				.map(x => x.user);
+			const users = reactions.map(x => x.user);
 
 			os.popup(XDetails, {
 				showing,
@@ -115,8 +109,6 @@ export default defineComponent({
 			buttonRef,
 			canToggle,
 			toggleReaction,
-			onMouseover,
-			onMouseleave,
 		};
 	},
 });

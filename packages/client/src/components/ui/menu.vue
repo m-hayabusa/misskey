@@ -1,11 +1,11 @@
 <template>
-<div class="rrevdjwt" :class="{ center: align === 'center' }"
-	:style="{ width: width ? width + 'px' : null }"
-	ref="items"
+<div ref="items" v-hotkey="keymap"
+	class="rrevdjwt"
+	:class="{ center: align === 'center', asDrawer }"
+	:style="{ width: (width && !asDrawer) ? width + 'px' : null, maxHeight: maxHeight ? maxHeight + 'px' : null }"
 	@contextmenu.self="e => e.preventDefault()"
-	v-hotkey="keymap"
 >
-	<template v-for="(item, i) in _items">
+	<template v-for="(item, i) in items2">
 		<div v-if="item === null" class="divider"></div>
 		<span v-else-if="item.type === 'label'" class="label item">
 			<span>{{ item.text }}</span>
@@ -13,29 +13,29 @@
 		<span v-else-if="item.type === 'pending'" :tabindex="i" class="pending item">
 			<span><MkEllipsis/></span>
 		</span>
-		<MkA v-else-if="item.type === 'link'" :to="item.to" @click.passive="close()" :tabindex="i" class="_button item">
+		<MkA v-else-if="item.type === 'link'" :to="item.to" :tabindex="i" class="_button item" @click.passive="close()">
 			<i v-if="item.icon" class="fa-fw" :class="item.icon"></i>
 			<MkAvatar v-if="item.avatar" :user="item.avatar" class="avatar"/>
 			<span>{{ item.text }}</span>
 			<span v-if="item.indicate" class="indicator"><i class="fas fa-circle"></i></span>
 		</MkA>
-		<a v-else-if="item.type === 'a'" :href="item.href" :target="item.target" :download="item.download" @click="close()" :tabindex="i" class="_button item">
+		<a v-else-if="item.type === 'a'" :href="item.href" :target="item.target" :download="item.download" :tabindex="i" class="_button item" @click="close()">
 			<i v-if="item.icon" class="fa-fw" :class="item.icon"></i>
 			<span>{{ item.text }}</span>
 			<span v-if="item.indicate" class="indicator"><i class="fas fa-circle"></i></span>
 		</a>
-		<button v-else-if="item.type === 'user'" @click="clicked(item.action, $event)" :tabindex="i" class="_button item">
+		<button v-else-if="item.type === 'user'" :tabindex="i" class="_button item" @click="clicked(item.action, $event)">
 			<MkAvatar :user="item.user" class="avatar"/><MkUserName :user="item.user"/>
 			<span v-if="item.indicate" class="indicator"><i class="fas fa-circle"></i></span>
 		</button>
-		<button v-else @click="clicked(item.action, $event)" :tabindex="i" class="_button item" :class="{ danger: item.danger, active: item.active }" :disabled="item.active">
+		<button v-else :tabindex="i" class="_button item" :class="{ danger: item.danger, active: item.active }" :disabled="item.active" @click="clicked(item.action, $event)">
 			<i v-if="item.icon" class="fa-fw" :class="item.icon"></i>
 			<MkAvatar v-if="item.avatar" :user="item.avatar" class="avatar"/>
 			<span>{{ item.text }}</span>
 			<span v-if="item.indicate" class="indicator"><i class="fas fa-circle"></i></span>
 		</button>
 	</template>
-	<span v-if="_items.length === 0" class="none item">
+	<span v-if="items2.length === 0" class="none item">
 		<span>{{ $ts.none }}</span>
 	</span>
 </div>
@@ -56,6 +56,10 @@ export default defineComponent({
 			type: Boolean,
 			required: false
 		},
+		asDrawer: {
+			type: Boolean,
+			required: false
+		},
 		align: {
 			type: String,
 			requried: false
@@ -64,11 +68,15 @@ export default defineComponent({
 			type: Number,
 			required: false
 		},
+		maxHeight: {
+			type: Number,
+			required: false
+		},
 	},
 	emits: ['close'],
 	data() {
 		return {
-			_items: [],
+			items2: [],
 		};
 	},
 	computed: {
@@ -96,7 +104,7 @@ export default defineComponent({
 					}
 				}
 
-				this._items = items;
+				this.items2 = items;
 			},
 			immediate: true
 		}
@@ -146,9 +154,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 .rrevdjwt {
 	padding: 8px 0;
+	box-sizing: border-box;
 	min-width: 200px;
-	max-height: 90vh;
 	overflow: auto;
+	overscroll-behavior: contain;
 
 	&.center {
 		> .item {
@@ -271,8 +280,31 @@ export default defineComponent({
 
 	> .divider {
 		margin: 8px 0;
-		height: 1px;
-		background: var(--divider);
+		border-top: solid 0.5px var(--divider);
+	}
+
+	&.asDrawer {
+		padding: 12px 0;
+		width: 100%;
+
+		> .item {
+			font-size: 1em;
+			padding: 12px 24px;
+
+			&:before {
+				width: calc(100% - 24px);
+				border-radius: 12px;
+			}
+
+			> i {
+				margin-right: 14px;
+				width: 24px;
+			}
+		}
+
+		> .divider {
+			margin: 12px 0;
+		}
 	}
 }
 </style>

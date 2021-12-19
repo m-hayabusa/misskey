@@ -1,31 +1,31 @@
 <template>
-<div class="swhvrteh _popup _shadow" @contextmenu.prevent="() => {}">
-	<ol class="users" ref="suggests" v-if="type === 'user'">
-		<li v-for="user in users" @click="complete(type, user)" @keydown="onKeydown" tabindex="-1" class="user">
+<div class="swhvrteh _popup _shadow" :style="{ zIndex }" @contextmenu.prevent="() => {}">
+	<ol v-if="type === 'user'" ref="suggests" class="users">
+		<li v-for="user in users" tabindex="-1" class="user" @click="complete(type, user)" @keydown="onKeydown">
 			<img class="avatar" :src="user.avatarUrl"/>
 			<span class="name">
-				<MkUserName :user="user" :key="user.id"/>
+				<MkUserName :key="user.id" :user="user"/>
 			</span>
 			<span class="username">@{{ acct(user) }}</span>
 		</li>
-		<li @click="chooseUser()" @keydown="onKeydown" tabindex="-1" class="choose">{{ $ts.selectUser }}</li>
+		<li tabindex="-1" class="choose" @click="chooseUser()" @keydown="onKeydown">{{ $ts.selectUser }}</li>
 	</ol>
-	<ol class="hashtags" ref="suggests" v-else-if="hashtags.length > 0">
-		<li v-for="hashtag in hashtags" @click="complete(type, hashtag)" @keydown="onKeydown" tabindex="-1">
+	<ol v-else-if="hashtags.length > 0" ref="suggests" class="hashtags">
+		<li v-for="hashtag in hashtags" tabindex="-1" @click="complete(type, hashtag)" @keydown="onKeydown">
 			<span class="name">{{ hashtag }}</span>
 		</li>
 	</ol>
-	<ol class="emojis" ref="suggests" v-else-if="emojis.length > 0">
-		<li v-for="emoji in emojis" @click="complete(type, emoji.emoji)" @keydown="onKeydown" tabindex="-1">
-			<span class="emoji" v-if="emoji.isCustomEmoji"><img :src="$store.state.disableShowingAnimatedImages ? getStaticImageUrl(emoji.url) : emoji.url" :alt="emoji.emoji"/></span>
-			<span class="emoji" v-else-if="!$store.state.useOsNativeEmojis"><img :src="emoji.url" :alt="emoji.emoji"/></span>
-			<span class="emoji" v-else>{{ emoji.emoji }}</span>
+	<ol v-else-if="emojis.length > 0" ref="suggests" class="emojis">
+		<li v-for="emoji in emojis" tabindex="-1" @click="complete(type, emoji.emoji)" @keydown="onKeydown">
+			<span v-if="emoji.isCustomEmoji" class="emoji"><img :src="$store.state.disableShowingAnimatedImages ? getStaticImageUrl(emoji.url) : emoji.url" :alt="emoji.emoji"/></span>
+			<span v-else-if="!$store.state.useOsNativeEmojis" class="emoji"><img :src="emoji.url" :alt="emoji.emoji"/></span>
+			<span v-else class="emoji">{{ emoji.emoji }}</span>
 			<span class="name" v-html="emoji.name.replace(q, `<b>${q}</b>`)"></span>
-			<span class="alias" v-if="emoji.aliasOf">({{ emoji.aliasOf }})</span>
+			<span v-if="emoji.aliasOf" class="alias">({{ emoji.aliasOf }})</span>
 		</li>
 	</ol>
-	<ol class="mfmTags" ref="suggests" v-else-if="mfmTags.length > 0">
-		<li v-for="tag in mfmTags" @click="complete(type, tag)" @keydown="onKeydown" tabindex="-1">
+	<ol v-else-if="mfmTags.length > 0" ref="suggests" class="mfmTags">
+		<li v-for="tag in mfmTags" tabindex="-1" @click="complete(type, tag)" @keydown="onKeydown">
 			<span class="tag">{{ tag }}</span>
 		</li>
 	</ol>
@@ -157,6 +157,7 @@ export default defineComponent({
 			items: [],
 			mfmTags: [],
 			select: -1,
+			zIndex: os.claimZIndex('high'),
 		}
 	},
 
@@ -403,7 +404,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .swhvrteh {
 	position: fixed;
-	z-index: 65535;
 	max-width: 100%;
 	margin-top: calc(1em + 8px);
 	overflow: hidden;

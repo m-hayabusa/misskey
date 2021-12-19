@@ -1,18 +1,25 @@
 <template>
-<div class="vvcocwet" :class="{ wide: !narrow }" ref="el">
-	<div class="nav" v-if="!narrow || page == null">
-		<MkSpacer :content-max="700">
-			<div class="baaadecd">
-				<div class="title">{{ $ts.settings }}</div>
-				<MkInfo v-if="emailNotConfigured" warn class="info">{{ $ts.emailNotConfiguredWarning }} <MkA to="/settings/email" class="_link">{{ $ts.configure }}</MkA></MkInfo>
-				<MkSuperMenu :def="menuDef" :grid="page == null"></MkSuperMenu>
+<MkSpacer :content-max="900" :margin-min="20" :margin-max="32">
+	<div ref="el" class="vvcocwet" :class="{ wide: !narrow }">
+		<div class="header">
+			<div class="title">{{ $ts.settings }}</div>
+			<div v-if="childInfo" class="subtitle">{{ childInfo.title }}</div>
+		</div>
+		<div class="body">
+			<div v-if="!narrow || page == null" class="nav">
+				<div class="baaadecd">
+					<MkInfo v-if="emailNotConfigured" warn class="info">{{ $ts.emailNotConfiguredWarning }} <MkA to="/settings/email" class="_link">{{ $ts.configure }}</MkA></MkInfo>
+					<MkSuperMenu :def="menuDef" :grid="page == null"></MkSuperMenu>
+				</div>
 			</div>
-		</MkSpacer>
+			<div class="main">
+				<div class="bkzroven">
+					<component :is="component" :key="page" v-bind="pageProps" @info="onInfo"/>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="main">
-		<component :is="component" :key="page" v-bind="pageProps"/>
-	</div>
-</div>
+</MkSpacer>
 </template>
 
 <script lang="ts">
@@ -52,6 +59,7 @@ export default defineComponent({
 		const narrow = ref(false);
 		const view = ref(null);
 		const el = ref(null);
+		const childInfo = ref(null);
 		const menuDef = computed(() => [{
 			title: i18n.locale.basicSettings,
 			items: [{
@@ -131,6 +139,11 @@ export default defineComponent({
 				to: '/settings/import-export',
 				active: page.value === 'import-export',
 			}, {
+				icon: 'fas fa-volume-mute',
+				text: i18n.locale.instanceMute,
+				to: '/settings/instance-mute',
+				active: page.value === 'instance-mute',
+			}, {
 				icon: 'fas fa-ban',
 				text: i18n.locale.muteAndBlock,
 				to: '/settings/mute-block',
@@ -184,6 +197,7 @@ export default defineComponent({
 				case 'notifications': return defineAsyncComponent(() => import('./notifications.vue'));
 				case 'mute-block': return defineAsyncComponent(() => import('./mute-block.vue'));
 				case 'word-mute': return defineAsyncComponent(() => import('./word-mute.vue'));
+				case 'instance-mute': return defineAsyncComponent(() => import('./instance-mute.vue'));
 				case 'integration': return defineAsyncComponent(() => import('./integration.vue'));
 				case 'security': return defineAsyncComponent(() => import('./security.vue'));
 				case '2fa': return defineAsyncComponent(() => import('./2fa.vue'));
@@ -192,8 +206,6 @@ export default defineComponent({
 				case 'other': return defineAsyncComponent(() => import('./other.vue'));
 				case 'general': return defineAsyncComponent(() => import('./general.vue'));
 				case 'email': return defineAsyncComponent(() => import('./email.vue'));
-				case 'email/address': return defineAsyncComponent(() => import('./email-address.vue'));
-				case 'email/notification': return defineAsyncComponent(() => import('./email-notification.vue'));
 				case 'theme': return defineAsyncComponent(() => import('./theme.vue'));
 				case 'theme/install': return defineAsyncComponent(() => import('./theme.install.vue'));
 				case 'theme/manage': return defineAsyncComponent(() => import('./theme.manage.vue'));
@@ -217,6 +229,7 @@ export default defineComponent({
 			if (page.value.startsWith('registry/value/system/')) {
 				return defineAsyncComponent(() => import('./registry.value.vue'));
 			}
+			return null;
 		});
 
 		watch(component, () => {
@@ -258,6 +271,10 @@ export default defineComponent({
 
 		const emailNotConfigured = computed(() => instance.enableEmail && ($i.email == null || !$i.emailVerified));
 
+		const onInfo = (info) => {
+			childInfo.value = info;
+		};
+
 		return {
 			[symbols.PAGE_INFO]: INFO,
 			page,
@@ -268,6 +285,8 @@ export default defineComponent({
 			pageProps,
 			component,
 			emailNotConfigured,
+			onInfo,
+			childInfo,
 		};
 	},
 });
@@ -275,51 +294,63 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .vvcocwet {
-	> .nav {
-		.baaadecd {
-			> .title {
-				margin: 16px;
-				font-size: 1.5em;
-				font-weight: bold;
-			}
+	> .header {
+		display: flex;
+		margin-bottom: 24px;
+		font-size: 1.3em;
+		font-weight: bold;
 
-			> .info {
-				margin: 0 16px;
-			}
+		> .title {
+			width: 34%;
+		}
 
-			> .accounts {
-				> .avatar {
-					display: block;
-					width: 50px;
-					height: 50px;
-					margin: 8px auto 16px auto;
-				}
-			}
+		> .subtitle {
+			flex: 1;
+			min-width: 0;
 		}
 	}
 
-	&.wide {
-		display: flex;
-		max-width: 1000px;
-		margin: 0 auto;
-		height: 100%;
-
+	> .body {
 		> .nav {
-			width: 32%;
-			box-sizing: border-box;
-			overflow: auto;
-
 			.baaadecd {
-				> .title {
-					margin: 24px 0;
+				> .info {
+					margin: 16px 0;
+				}
+
+				> .accounts {
+					> .avatar {
+						display: block;
+						width: 50px;
+						height: 50px;
+						margin: 8px auto 16px auto;
+					}
 				}
 			}
 		}
 
 		> .main {
-			flex: 1;
-			min-width: 0;
-			overflow: auto;
+			.bkzroven {
+			}
+		}
+	}
+
+	&.wide {
+		> .body {
+			display: flex;
+			height: 100%;
+
+			> .nav {
+				width: 34%;
+				padding-right: 32px;
+				box-sizing: border-box;
+				overflow: auto;
+			}
+
+			> .main {
+				flex: 1;
+				min-width: 0;
+				overflow: auto;
+			}
 		}
 	}
 }

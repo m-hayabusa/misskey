@@ -2,6 +2,7 @@ import { publishMainStream, publishUserEvent } from '@/services/stream';
 import { renderActivity } from '@/remote/activitypub/renderer/index';
 import renderFollow from '@/remote/activitypub/renderer/follow';
 import renderUndo from '@/remote/activitypub/renderer/undo';
+import renderReject from '@/remote/activitypub/renderer/reject';
 import { deliver } from '@/queue/index';
 import Logger from '../logger';
 import { registerOrFetchInstanceDoc } from '../register-or-fetch-instance-doc';
@@ -14,7 +15,7 @@ const logger = new Logger('following/delete');
 export default async function(follower: { id: User['id']; host: User['host']; uri: User['host']; inbox: User['inbox']; sharedInbox: User['sharedInbox']; }, followee: { id: User['id']; host: User['host']; uri: User['host']; inbox: User['inbox']; sharedInbox: User['sharedInbox']; }, silent = false) {
 	const following = await Followings.findOne({
 		followerId: follower.id,
-		followeeId: followee.id
+		followeeId: followee.id,
 	});
 
 	if (following == null) {
@@ -29,7 +30,7 @@ export default async function(follower: { id: User['id']; host: User['host']; ur
 	// Publish unfollow event
 	if (!silent && Users.isLocalUser(follower)) {
 		Users.pack(followee.id, follower, {
-			detail: true
+			detail: true,
 		}).then(packed => {
 			publishUserEvent(follower.id, 'unfollow', packed);
 			publishMainStream(follower.id, 'unfollow', packed);
@@ -39,6 +40,12 @@ export default async function(follower: { id: User['id']; host: User['host']; ur
 	if (Users.isLocalUser(follower) && Users.isRemoteUser(followee)) {
 		const content = renderActivity(renderUndo(renderFollow(follower, followee), follower));
 		deliver(follower, content, followee.inbox);
+	}
+
+	if (Users.isLocalUser(followee) && Users.isRemoteUser(follower)) {
+		// local user has null host
+		const content = renderActivity(renderReject(renderFollow(follower, followee), followee));
+		deliver(followee, content, follower.inbox);
 	}
 }
 

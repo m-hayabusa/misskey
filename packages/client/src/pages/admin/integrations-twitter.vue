@@ -6,7 +6,7 @@
 		</FormSwitch>
 
 		<template v-if="enableTwitterIntegration">
-			<FormInfo>Callback URL: {{ `${url}/api/tw/cb` }}</FormInfo>
+			<FormInfo>Callback URL: {{ `${uri}/api/tw/cb` }}</FormInfo>
 		
 			<FormInput v-model="twitterConsumerKey">
 				<template #prefix><i class="fas fa-key"></i></template>
@@ -19,7 +19,7 @@
 			</FormInput>
 		</template>
 
-		<FormButton @click="save" primary><i class="fas fa-save"></i> {{ $ts.save }}</FormButton>
+		<FormButton primary @click="save"><i class="fas fa-save"></i> {{ $ts.save }}</FormButton>
 	</FormSuspense>
 </FormBase>
 </template>
@@ -67,6 +67,7 @@ export default defineComponent({
 	methods: {
 		async init() {
 			const meta = await os.api('meta', { detail: true });
+			this.uri = meta.uri;
 			this.enableTwitterIntegration = meta.enableTwitterIntegration;
 			this.twitterConsumerKey = meta.twitterConsumerKey;
 			this.twitterConsumerSecret = meta.twitterConsumerSecret;

@@ -106,7 +106,7 @@ clickToShow: "クリックして表示"
 sensitive: "閲覧注意"
 add: "追加"
 reaction: "リアクション"
-reactionSettingDescription: "リアクションピッカーに表示するリアクションを設定します。"
+reactionSetting: "ピッカーに表示するリアクション"
 reactionSettingDescription2: "ドラッグして並び替え、クリックして削除、＋を押して追加します。"
 rememberNoteVisibility: "公開範囲を記憶する"
 attachCancel: "添付取り消し"
@@ -592,6 +592,7 @@ smtpSecure: "SMTP 接続に暗黙的なSSL/TLSを使用する"
 smtpSecureInfo: "STARTTLS使用時はオフにします。"
 testEmail: "配信テスト"
 wordMute: "ワードミュート"
+instanceMute: "インスタンスミュート"
 userSaysSomething: "{name}が何かを言いました"
 makeActive: "アクティブにする"
 display: "表示"
@@ -684,6 +685,7 @@ center: "中央"
 wide: "広い"
 narrow: "狭い"
 reloadToApplySetting: "設定はページリロード後に反映されます。今すぐリロードしますか？"
+needReloadToApply: "反映には再起動が必要です。"
 showTitlebar: "タイトルバーを表示する"
 clearCache: "キャッシュをクリア"
 onlineUsersCount: "{n}人がオンライン"
@@ -792,6 +794,7 @@ pubSub: "Pub/Subのアカウント"
 lastCommunication: "直近の通信"
 resolved: "解決済み"
 unresolved: "未解決"
+breakFollow: "フォロワーを解除"
 itsOn: "オンになっています"
 itsOff: "オフになっています"
 emailRequiredForSignup: "アカウント登録にメールアドレスを必須にする"
@@ -806,6 +809,15 @@ muteThread: "スレッドをミュート"
 unmuteThread: "スレッドのミュートを解除"
 ffVisibility: "つながりの公開範囲"
 ffVisibilityDescription: "自分のフォロー/フォロワー情報の公開範囲を設定できます。"
+continueThread: "さらにスレッドを見る"
+deleteAccountConfirm: "アカウントが削除されます。よろしいですか？"
+incorrectPassword: "パスワードが間違っています。"
+voteConfirm: "「{choice}」に投票しますか？"
+hide: "隠す"
+leaveGroup: "グループから抜ける"
+leaveGroupConfirm: "「{name}」から抜けますか？"
+useDrawerReactionPickerForMobile: "モバイルデバイスのときドロワーで表示"
+welcomeBackWithName: "おかえりなさい、{name}さん"
 
 _emailUnavailable:
   used: "既に使用されています"
@@ -821,7 +833,7 @@ _ffVisibility:
 
 _signup:
   almostThere: "ほとんど完了です"
-  emailAddressInfo: "あなたが使っているメールアドレスを入力してください。"
+  emailAddressInfo: "あなたが使っているメールアドレスを入力してください。メールアドレスが公開されることはありません。"
   emailSent: "入力されたメールアドレス({email})宛に確認のメールが送信されました。メールに記載されたリンクにアクセスすると、アカウントの作成が完了します。"
 
 _accountDelete:
@@ -942,6 +954,8 @@ _mfm:
   rainbowDescription: "内容をレインボーにします。"
   sparkle: "キラキラ"
   sparkleDescription: "キラキラしたパーティクルのエフェクトを追加します。"
+  rotate: "回転"
+  rotateDescription: "指定した角度で回転させます。"
 
 _reversi:
   reversi: "リバーシ"
@@ -1013,6 +1027,12 @@ _wordMute:
   soft: "ソフト"
   hard: "ハード"
   mutedNotes: "ミュートされたノート"
+
+_instanceMute:
+  instanceMuteDescription: "ミュートしたインスタンスのユーザーへの返信を含めて、設定したインスタンスの全てのノートとRenoteをミュートします。"
+  instanceMuteDescription2: "改行で区切って設定します"
+  title: "設定したインスタンスのノートを隠します。"
+  heading: "ミュートするインスタンス"
 
 _theme:
   explore: "テーマを探す"
@@ -1304,6 +1324,8 @@ _exportOrImport:
   muteList: "ミュート"
   blockingList: "ブロック"
   userLists: "リスト"
+  excludeMutingUsers: "ミュートしているユーザーを除外"
+  excludeInactiveUsers: "使われていないアカウントを除外"
 
 _charts:
   federationInstancesIncDec: "連合の増減"

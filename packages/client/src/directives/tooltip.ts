@@ -1,9 +1,12 @@
-import { Directive, ref } from 'vue';
-import { isDeviceTouch } from '@/scripts/is-device-touch';
-import { popup, dialog } from '@/os';
+// TODO: useTooltip関数使うようにしたい
+// ただディレクティブ内でonUnmountedなどのcomposition api使えるのか不明
 
-const start = isDeviceTouch ? 'touchstart' : 'mouseover';
-const end = isDeviceTouch ? 'touchend' : 'mouseleave';
+import { Directive, ref } from 'vue';
+import { isTouchUsing } from '@/scripts/touch';
+import { popup, alert } from '@/os';
+
+const start = isTouchUsing ? 'touchstart' : 'mouseover';
+const end = isTouchUsing ? 'touchend' : 'mouseleave';
 const delay = 100;
 
 export default {
@@ -28,7 +31,7 @@ export default {
 			el.addEventListener('click', (ev) => {
 				ev.preventDefault();
 				ev.stopPropagation();
-				dialog({
+				alert({
 					type: 'info',
 					text: binding.value,
 				});

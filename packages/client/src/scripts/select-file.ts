@@ -1,8 +1,9 @@
 import * as os from '@/os';
 import { i18n } from '@/i18n';
 import { defaultStore } from '@/store';
+import { DriveFile } from 'misskey-js/built/entities';
 
-export function selectFile(src: any, label: string | null, multiple = false) {
+function select(src: any, label: string | null, multiple: boolean): Promise<DriveFile | DriveFile[]> {
 	return new Promise((res, rej) => {
 		const chooseFileFromPc = () => {
 			const input = document.createElement('input');
@@ -14,7 +15,7 @@ export function selectFile(src: any, label: string | null, multiple = false) {
 				Promise.all(promises).then(driveFiles => {
 					res(multiple ? driveFiles : driveFiles[0]);
 				}).catch(e => {
-					os.dialog({
+					os.alert({
 						type: 'error',
 						text: e
 					});
@@ -38,11 +39,10 @@ export function selectFile(src: any, label: string | null, multiple = false) {
 		};
 
 		const chooseFileFromUrl = () => {
-			os.dialog({
+			os.inputText({
 				title: i18n.locale.uploadFromUrl,
-				input: {
-					placeholder: i18n.locale.uploadFromUrlDescription
-				}
+				type: 'url',
+				placeholder: i18n.locale.uploadFromUrlDescription
 			}).then(({ canceled, result: url }) => {
 				if (canceled) return;
 
@@ -62,7 +62,7 @@ export function selectFile(src: any, label: string | null, multiple = false) {
 					marker
 				});
 
-				os.dialog({
+				os.alert({
 					title: i18n.locale.uploadFromUrlRequested,
 					text: i18n.locale.uploadFromUrlMayTakeTime
 				});
@@ -86,4 +86,12 @@ export function selectFile(src: any, label: string | null, multiple = false) {
 			action: chooseFileFromUrl
 		}], src);
 	});
+}
+
+export function selectFile(src: any, label: string | null = null): Promise<DriveFile> {
+	return select(src, label, false) as Promise<DriveFile>;
+}
+
+export function selectFiles(src: any, label: string | null = null): Promise<DriveFile[]> {
+	return select(src, label, true) as Promise<DriveFile[]>;
 }

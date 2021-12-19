@@ -49,6 +49,11 @@ If your language is not listed in Crowdin, please open an issue.
 
 ![Crowdin](https://d322cqt584bo4o.cloudfront.net/misskey/localized.svg)
 
+## Development
+During development, it is useful to use the `npm run dev` command.
+This command monitors the server-side and client-side source files and automatically builds them if they are modified.
+In addition, it will also automatically start the Misskey server process.
+
 ## Testing
 - Test codes are located in [`/test`](/test).
 
@@ -79,6 +84,11 @@ TODO
 ## Continuous integration
 Misskey uses GitHub Actions for executing automated tests.
 Configuration files are located in [`/.github/workflows`](/.github/workflows).
+
+## Vue
+Misskey uses Vue(v3) as its front-end framework.
+**When creating a new component, please use the Composition API instead of the Options API.**
+Some of the existing components are implemented in the Options API, but it is an old implementation. Refactors that migrate those components to the Composition API are also welcome.
 
 ## Adding MisskeyRoom items
 * Use English for material, object and texture names.
