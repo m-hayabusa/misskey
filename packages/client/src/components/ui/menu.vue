@@ -24,7 +24,7 @@
 			<span>{{ item.text }}</span>
 			<span v-if="item.indicate" class="indicator"><i class="fas fa-circle"></i></span>
 		</a>
-		<button v-else-if="item.type === 'user'" :tabindex="i" class="_button item" @click="clicked(item.action, $event)">
+		<button v-else-if="item.type === 'user'" :tabindex="i" class="_button item" :class="{ active: item.active }" :disabled="item.active" @click="clicked(item.action, $event)">
 			<MkAvatar :user="item.user" class="avatar"/><MkUserName :user="item.user"/>
 			<span v-if="item.indicate" class="indicator"><i class="fas fa-circle"></i></span>
 		</button>
@@ -284,7 +284,7 @@ export default defineComponent({
 	}
 
 	&.asDrawer {
-		padding: 12px 0;
+		padding: 12px 0 calc(env(safe-area-inset-bottom, 0px) + 12px) 0;
 		width: 100%;
 
 		> .item {

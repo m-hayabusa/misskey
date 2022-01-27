@@ -7,27 +7,19 @@
 		</div>
 		<div class="body">
 			<div class="content">
-				<Mfm :text="text" :author="$i" :i="$i"/>
+				<Mfm :text="text.trim()" :author="$i" :i="$i"/>
 			</div>
 		</div>
 	</div>
 </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { } from 'vue';
 
-export default defineComponent({
-	components: {
-	},
-
-	props: {
-		text: {
-			type: String,
-			required: true
-		}
-	},
-});
+const props = defineProps<{
+	text: string;
+}>();
 </script>
 
 <style lang="scss" scoped>
@@ -61,6 +53,7 @@ export default defineComponent({
 		width: 40px;
 		height: 40px;
 		border-radius: 8px;
+		pointer-events: none;
 	}
 
 	> .main {
@@ -69,6 +62,7 @@ export default defineComponent({
 
 		> .header {
 			margin-bottom: 2px;
+			font-weight: bold;
 		}
 
 		> .body {

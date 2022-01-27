@@ -1,42 +1,24 @@
 <template>
 <MkSpacer :content-max="800">
-	<XNotes :pagination="pagination" @before="before()" @after="after()"/>
+	<XNotes :pagination="pagination"/>
 </MkSpacer>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import Progress from '@/scripts/loading';
+<script lang="ts" setup>
 import XNotes from '@/components/notes.vue';
 import * as symbols from '@/symbols';
+import { i18n } from '@/i18n';
 
-export default defineComponent({
-	components: {
-		XNotes
+const pagination = {
+	endpoint: 'notes/mentions' as const,
+	limit: 10,
+};
+
+defineExpose({
+	[symbols.PAGE_INFO]: {
+		title: i18n.locale.mentions,
+		icon: 'fas fa-at',
+		bg: 'var(--bg)',
 	},
-
-	data() {
-		return {
-			[symbols.PAGE_INFO]: {
-				title: this.$ts.mentions,
-				icon: 'fas fa-at',
-				bg: 'var(--bg)',
-			},
-			pagination: {
-				endpoint: 'notes/mentions',
-				limit: 10,
-			},
-		};
-	},
-
-	methods: {
-		before() {
-			Progress.start();
-		},
-
-		after() {
-			Progress.done();
-		}
-	}
 });
 </script>

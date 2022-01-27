@@ -1,7 +1,7 @@
 <template>
 <MkSpacer :content-max="700">
 	<div class="mk-list-page">
-		<transition name="zoom" mode="out-in">
+		<transition :name="$store.state.animation ? 'zoom' : ''" mode="out-in">
 			<div v-if="list" class="_section">
 				<div class="_content">
 					<MkButton inline @click="addUser()">{{ $ts.addUser }}</MkButton>
@@ -11,7 +11,7 @@
 			</div>
 		</transition>
 
-		<transition name="zoom" mode="out-in">
+		<transition :name="$store.state.animation ? 'zoom' : ''" mode="out-in">
 			<div v-if="list" class="_section members _gap">
 				<div class="_title">{{ $ts.members }}</div>
 				<div class="_content">
@@ -36,7 +36,6 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import Progress from '@/scripts/loading';
 import MkButton from '@/components/ui/button.vue';
 import * as os from '@/os';
 import * as symbols from '@/symbols';
@@ -68,7 +67,6 @@ export default defineComponent({
 
 	methods: {
 		fetch() {
-			Progress.start();
 			os.api('users/lists/show', {
 				listId: this.$route.params.list
 			}).then(list => {
@@ -77,7 +75,6 @@ export default defineComponent({
 					userIds: this.list.userIds
 				}).then(users => {
 					this.users = users;
-					Progress.done();
 				});
 			});
 		},

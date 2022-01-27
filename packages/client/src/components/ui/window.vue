@@ -147,9 +147,9 @@ export default defineComponent({
 			}
 		},
 
-		onContextmenu(e) {
+		onContextmenu(ev: MouseEvent) {
 			if (this.contextmenu) {
-				os.contextMenu(this.contextmenu, e);
+				os.contextMenu(this.contextmenu, ev);
 			}
 		},
 
@@ -414,6 +414,10 @@ export default defineComponent({
 				}
 			}
 
+			> .left {
+				min-width: 16px;
+			}
+
 			> .title {
 				flex: 1;
 				position: relative;
@@ -421,7 +425,6 @@ export default defineComponent({
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
-				text-align: center;
 				cursor: move;
 			}
 		}

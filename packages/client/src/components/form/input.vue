@@ -5,7 +5,7 @@
 		<div ref="prefixEl" class="prefix"><slot name="prefix"></slot></div>
 		<input ref="inputEl"
 			v-model="v"
-			v-panel
+			v-adaptive-border
 			:type="type"
 			:disabled="disabled"
 			:required="required"
@@ -167,7 +167,7 @@ export default defineComponent({
 
 				// このコンポーネントが作成された時、非表示状態である場合がある
 				// 非表示状態だと要素の幅などは0になってしまうので、定期的に計算する
-				const clock = setInterval(() => {
+				const clock = window.setInterval(() => {
 					if (prefixEl.value) {
 						if (prefixEl.value.offsetWidth) {
 							inputEl.value.style.paddingLeft = prefixEl.value.offsetWidth + 'px';
@@ -181,7 +181,7 @@ export default defineComponent({
 				}, 100);
 
 				onUnmounted(() => {
-					clearInterval(clock);
+					window.clearInterval(clock);
 				});
 			});
 		});
@@ -243,7 +243,8 @@ export default defineComponent({
 			font-weight: normal;
 			font-size: 1em;
 			color: var(--fg);
-			border: solid 0.5px var(--panel);
+			background: var(--panel);
+			border: solid 1px var(--panel);
 			border-radius: 6px;
 			outline: none;
 			box-shadow: none;
@@ -251,7 +252,7 @@ export default defineComponent({
 			transition: border-color 0.1s ease-out;
 
 			&:hover {
-				border-color: var(--inputBorderHover);
+				border-color: var(--inputBorderHover) !important;
 			}
 		}
 
@@ -298,7 +299,7 @@ export default defineComponent({
 
 		&.focused {
 			> input {
-				border-color: var(--accent);
+				border-color: var(--accent) !important;
 				//box-shadow: 0 0 0 4px var(--focus);
 			}
 		}

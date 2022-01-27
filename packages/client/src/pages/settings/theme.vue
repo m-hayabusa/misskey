@@ -1,6 +1,6 @@
 <template>
 <div class="_formRoot">
-	<div v-panel class="rfqxtzch _formBlock">
+	<div v-adaptive-border class="rfqxtzch _panel _formBlock">
 		<div class="toggle">
 			<div class="toggleWrapper">
 				<input id="dn" v-model="darkMode" type="checkbox" class="dn"/>
@@ -161,10 +161,6 @@ export default defineComponent({
 				localStorage.setItem('wallpaper', wallpaper.value);
 			}
 			location.reload();
-		});
-
-		onMounted(() => {
-			emit('info', INFO);
 		});
 
 		onActivated(() => {
