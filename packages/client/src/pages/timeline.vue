@@ -46,8 +46,10 @@ const keymap = {
 const tlComponent = $ref<InstanceType<typeof XTimeline>>();
 const rootEl = $ref<HTMLElement>();
 
-let src = $ref<'home' | 'local' | 'social' | 'global'>(defaultStore.state.tl.src);
 let queue = $ref(0);
+const src = $computed(() => defaultStore.reactiveState.tl.value.src);
+
+watch ($$(src), () => queue = 0);
 
 function queueUpdated(q: number): void {
 	queue = q;
@@ -60,44 +62,45 @@ function top(): void {
 async function chooseList(ev: MouseEvent): Promise<void> {
 	const lists = await os.api('users/lists/list');
 	const items = lists.map(list => ({
-		type: 'link',
+		type: 'link' as const,
 		text: list.name,
 		to: `/timeline/list/${list.id}`,
 	}));
-	os.popupMenu(items, ev.currentTarget || ev.target);
+	os.popupMenu(items, ev.currentTarget ?? ev.target);
 }
 
 async function chooseAntenna(ev: MouseEvent): Promise<void> {
 	const antennas = await os.api('antennas/list');
 	const items = antennas.map(antenna => ({
-		type: 'link',
+		type: 'link' as const,
 		text: antenna.name,
 		indicate: antenna.hasUnreadNote,
 		to: `/timeline/antenna/${antenna.id}`,
 	}));
-	os.popupMenu(items, ev.currentTarget || ev.target);
+	os.popupMenu(items, ev.currentTarget ?? ev.target);
 }
 
 async function chooseChannel(ev: MouseEvent): Promise<void> {
 	const channels = await os.api('channels/followed');
 	const items = channels.map(channel => ({
-		type: 'link',
+		type: 'link' as const,
 		text: channel.name,
 		indicate: channel.hasUnreadNote,
 		to: `/channels/${channel.id}`,
 	}));
-	os.popupMenu(items, ev.currentTarget || ev.target);
+	os.popupMenu(items, ev.currentTarget ?? ev.target);
 }
 
-function saveSrc(): void {
+function saveSrc(newSrc: 'home' | 'local' | 'social' | 'global'): void {
 	defaultStore.set('tl', {
-		src: src,
+		...defaultStore.state.tl,
+		src: newSrc,
 	});
 }
 
 async function timetravel(): Promise<void> {
 	const { canceled, result: date } = await os.inputDate({
-		title: i18n.locale.date,
+		title: i18n.ts.date,
 	});
 	if (canceled) return;
 
@@ -110,50 +113,50 @@ function focus(): void {
 
 defineExpose({
 	[symbols.PAGE_INFO]: computed(() => ({
-		title: i18n.locale.timeline,
+		title: i18n.ts.timeline,
 		icon: src === 'local' ? 'fas fa-comments' : src === 'social' ? 'fas fa-share-alt' : src === 'global' ? 'fas fa-globe' : 'fas fa-home',
 		bg: 'var(--bg)',
 		actions: [{
 			icon: 'fas fa-list-ul',
-			text: i18n.locale.lists,
+			text: i18n.ts.lists,
 			handler: chooseList,
 		}, {
 			icon: 'fas fa-satellite',
-			text: i18n.locale.antennas,
+			text: i18n.ts.antennas,
 			handler: chooseAntenna,
 		}, {
 			icon: 'fas fa-satellite-dish',
-			text: i18n.locale.channel,
+			text: i18n.ts.channel,
 			handler: chooseChannel,
 		}, {
 			icon: 'fas fa-calendar-alt',
-			text: i18n.locale.jumpToSpecifiedDate,
+			text: i18n.ts.jumpToSpecifiedDate,
 			handler: timetravel,
 		}],
 		tabs: [{
 			active: src === 'home',
-			title: i18n.locale._timelines.home,
+			title: i18n.ts._timelines.home,
 			icon: 'fas fa-home',
 			iconOnly: true,
-			onClick: () => { src = 'home'; saveSrc(); },
+			onClick: () => { saveSrc('home'); },
 		}, ...(isLocalTimelineAvailable ? [{
 			active: src === 'local',
-			title: i18n.locale._timelines.local,
+			title: i18n.ts._timelines.local,
 			icon: 'fas fa-comments',
 			iconOnly: true,
-			onClick: () => { src = 'local'; saveSrc(); },
+			onClick: () => { saveSrc('local'); },
 		}, {
 			active: src === 'social',
-			title: i18n.locale._timelines.social,
+			title: i18n.ts._timelines.social,
 			icon: 'fas fa-share-alt',
 			iconOnly: true,
-			onClick: () => { src = 'social'; saveSrc(); },
+			onClick: () => { saveSrc('social'); },
 		}] : []), ...(isGlobalTimelineAvailable ? [{
 			active: src === 'global',
-			title: i18n.locale._timelines.global,
+			title: i18n.ts._timelines.global,
 			icon: 'fas fa-globe',
 			iconOnly: true,
-			onClick: () => { src = 'global'; saveSrc(); },
+			onClick: () => { saveSrc('global'); },
 		}] : [])],
 	})),
 });

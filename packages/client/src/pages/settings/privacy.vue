@@ -8,7 +8,7 @@
 		<template #caption>{{ $ts.makeReactionsPublicDescription }}</template>
 	</FormSwitch>
 		
-	<FormSelect v-model="ffVisibility" class="_formBlock">
+	<FormSelect v-model="ffVisibility" class="_formBlock" @update:modelValue="save()">
 		<template #label>{{ $ts.ffVisibility }}</template>
 		<option value="public">{{ $ts._ffVisibility.public }}</option>
 		<option value="followers">{{ $ts._ffVisibility.followers }}</option>
@@ -86,7 +86,7 @@ function save() {
 
 defineExpose({
 	[symbols.PAGE_INFO]: {
-		title: i18n.locale.privacy,
+		title: i18n.ts.privacy,
 		icon: 'fas fa-lock-open',
 		bg: 'var(--bg)',
 	},

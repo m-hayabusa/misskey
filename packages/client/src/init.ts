@@ -14,7 +14,7 @@ if (localStorage.getItem('accounts') != null) {
 //#endregion
 
 import { computed, createApp, watch, markRaw, version as vueVersion } from 'vue';
-import * as compareVersions from 'compare-versions';
+import compareVersions from 'compare-versions';
 
 import widgets from '@/widgets';
 import directives from '@/directives';
@@ -32,7 +32,7 @@ import { defaultStore, ColdDeviceStorage } from '@/store';
 import { fetchInstance, instance } from '@/instance';
 import { makeHotkey } from '@/scripts/hotkey';
 import { search } from '@/scripts/search';
-import { isMobile } from '@/scripts/is-mobile';
+import { deviceKind } from '@/scripts/device-kind';
 import { initializeSw } from '@/scripts/initialize-sw';
 import { reloadChannel } from '@/scripts/unison-reload';
 import { reactionPicker } from '@/scripts/reaction-picker';
@@ -92,7 +92,7 @@ window.addEventListener('resize', () => {
 //#endregion
 
 // If mobile, insert the viewport meta tag
-if (isMobile || window.innerWidth <= 1024) {
+if (['smartphone', 'tablet'].includes(deviceKind)) {
 	const viewport = document.getElementsByName('viewport').item(0);
 	viewport.setAttribute('content',
 		`${viewport.getAttribute('content')},minimum-scale=1,maximum-scale=1,user-scalable=no`);
@@ -185,7 +185,7 @@ app.config.globalProperties = {
 	$store: defaultStore,
 	$instance: instance,
 	$t: i18n.t,
-	$ts: i18n.locale,
+	$ts: i18n.ts,
 };
 
 app.use(router);
@@ -299,8 +299,8 @@ stream.on('_disconnected_', async () => {
 		reloadDialogShowing = true;
 		const { canceled } = await confirm({
 			type: 'warning',
-			title: i18n.locale.disconnectedFromServer,
-			text: i18n.locale.reloadConfirm,
+			title: i18n.ts.disconnectedFromServer,
+			text: i18n.ts.reloadConfirm,
 		});
 		reloadDialogShowing = false;
 		if (!canceled) {
@@ -324,7 +324,7 @@ if ($i) {
 	if ($i.isDeleted) {
 		alert({
 			type: 'warning',
-			text: i18n.locale.accountDeletionInProgress,
+			text: i18n.ts.accountDeletionInProgress,
 		});
 	}
 
