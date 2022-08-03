@@ -4,5 +4,5 @@ import { toHtml } from '../../../mfm/to-html.js';
 
 export default function(note: Note) {
 	if (!note.text) return '';
-	return toHtml(mfm.parse(note.text), JSON.parse(note.mentionedRemoteUsers));
+	return toHtml(mfm.parseHalf(note.text), JSON.parse(note.mentionedRemoteUsers));
 }
