@@ -64,11 +64,11 @@ export default define(meta, paramDef, async (ps, me) => {
 	} else {
 		const nameQuery = Users.createQueryBuilder('user')
 			.where(new Brackets(qb => { 
-				qb.where('user.name ILIKE :query', { query: '%' + ps.query + '%' });
+				qb.where('user.name &@~ :query', { query: ps.query });
 
 				// Also search username if it qualifies as username
 				if (Users.validateLocalUsername(ps.query)) {
-					qb.orWhere('user.usernameLower LIKE :username', { username: '%' + ps.query.toLowerCase() + '%' });
+					qb.orWhere('user.usernameLower LIKE :username', { username: ps.query.toLowerCase() + '%' });
 				}
 			}))
 			.andWhere(new Brackets(qb => { qb
@@ -92,7 +92,7 @@ export default define(meta, paramDef, async (ps, me) => {
 		if (users.length < ps.limit) {
 			const profQuery = UserProfiles.createQueryBuilder('prof')
 				.select('prof.userId')
-				.where('prof.description ILIKE :query', { query: '%' + ps.query + '%' });
+				.where('prof.description &@~ :query', { query: ps.query });
 
 			if (ps.origin === 'local') {
 				profQuery.andWhere('prof.userHost IS NULL');
