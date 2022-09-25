@@ -41,8 +41,10 @@ export async function createImage(actor: CacheableRemoteUser, value: any): Promi
 	if (file.isLink) {
 		// URLが異なっている場合、同じ画像が以前に異なるURLで登録されていたということなので、
 		// URLを更新する
-		if (file.url !== image.url) {
+		if (file.url !== image.url || file.webpublicUrl !== image.url || file.thumbnailUrl !== image.url || file.uri !== image.url) {
 			await DriveFiles.update({ id: file.id }, {
+				webpublicUrl: image.url,
+				thumbnailUrl: image.url,
 				url: image.url,
 				uri: image.url,
 			});
