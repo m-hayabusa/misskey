@@ -13,7 +13,7 @@
 				<div class="desc" v-html="meta.description || $ts.headlineMisskey"></div>
 			</div>
 			<div class="action">
-				<MkButton class="signup" inline gradate @click="signup()">{{ $ts.signup }}</MkButton>
+				<MkButton class="signup" inline gradate to="/@mewl" :link="true">投稿一覧</MkButton>
 				<MkButton class="signin" inline @click="signin()">{{ $ts.login }}</MkButton>
 			</div>
 			<div v-if="onlineUsersCount && stats" class="status">
