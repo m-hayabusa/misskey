@@ -600,35 +600,35 @@ export function useUploader(options: {
 			item.uploadName = item.name;
 		}
 
-		const comment = await exifr.parse(preprocessedFile, true)
-			.catch(err => { console.error('Failed to parse image', err); })
-			.then((metadata) => {
-				if (metadata) {
-					if (metadata.ImageDescription) {
-						return metadata.ImageDescription;
-					} else if (metadata.descripton && metadata.descripton.value) {
-						return metadata.descripton.value;
-					} else if (metadata.userComment) {
-						try {
-							return new TextDecoder().decode(metadata.userComment).replaceAll('\0', '');
-						} catch (ex) {
-						// UTF-8でない可能性が高い 無視してよいだろう
-						}
-					}
+		try {
+			const metadata = await exifr.parse(item.file, true);
+			let caption: string | undefined = undefined;
+			if (metadata?.ImageDescription) {
+				caption = metadata.ImageDescription;
+			} else if (metadata?.description && metadata.description.value) {
+				caption = metadata.description.value;
+			} else if (metadata?.userComment) {
+				try {
+					caption = new TextDecoder().decode(metadata.userComment).replaceAll('\0', '');
+				} catch (ex) {
+					// UTF-8でない可能性が高い 無視してよいだろう
 				}
-			}).then(description => {
-				if (description) {
-					description = description.trim();
-					if (description.length >= 512) {
-						return description.slice(0, 512 - 3) + '...';
-					}
+			}
+			if (caption) {
+				if (typeof caption !== 'string') {
+					caption = String(caption);
 				}
-				return undefined;
-			});
+
+				if (caption.length >= 512) {
+					caption = caption.slice(0, 512 - 3) + '...';
+				}
+			}
+			item.caption = item.caption ?? caption ?? null;
+		} catch (err) {
+			console.error('Failed to parse image', err);
+		}
 
 		imageBitmap.close();
-
-		item.caption = item.caption ?? comment ?? null;
 
 		if (item.thumbnail != null) URL.revokeObjectURL(item.thumbnail);
 		item.thumbnail = THUMBNAIL_SUPPORTED_TYPES.includes(preprocessedFile.type) ? window.URL.createObjectURL(preprocessedFile) : null;
