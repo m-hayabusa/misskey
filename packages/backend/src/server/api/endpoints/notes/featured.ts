@@ -100,6 +100,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (!ps.global) query.andWhere('note.userHost IS NULL');
 
 			this.queryService.generateBlockedHostQueryForNote(query);
+			this.queryService.generateSuspendedUserQueryForNote(query);
 
 			const notes = (await query.getMany()).filter(note => {
 				if (me && isUserRelated(note, userIdsWhoBlockingMe)) return false;

@@ -4,10 +4,32 @@ VRTLのブランチで行われた変更点をまとめています
 
 <!-- VV Please add changelog here VV -->
 
+--- 2025.10.0-vrtl.1 released at this time ---
+
+--- 2025.9.0-vrtl.1 released at this time ---
+
+--- 2025.8.0-vrtl.1 released at this time ---
+
+- fix(frontend): VRTL系タイムラインが withReplies なしでロードされる問題 - 2025/08/03 #243
+
+--- 2025.7.0-vrtl.1 released at this time ---
+
+--- 2025.6.3-vrtl.1 released at this time ---
+
+--- 2025.6.1-vrtl.1 released at this time ---
+
+--- 2025.6.0-vrtl.1 released at this time ---
+
+--- 2025.5.1-vrtl.1 released at this time ---
+
+--- 2025.5.0-vrtl.1 released at this time ---
+
+- fix(frontend): LTLが無効な場合、公式クライアント上でVSTLが利用出来なくなる問題を修正 #228
+
 --- 2025.4.1-vrtl.1 released at this time ---
 
 - fix(backend): 自分のフォロワー限定投稿に対するリプライがぶいみみソーシャルタイムラインで見えないことが有る問題を修正 - 2025/04/30 #224
-- feat(backend): VRTLのサーバーリストを Redis にキャッシュし、取得に失敗した場合はキャッシュを使用するよにしました - 2025/04/30 #223
+- feat(backend): VRTLのサーバーリストを Redis にキャッシュし、取得に失敗した場合はキャッシュを使用するようにしました - 2025/04/30 #223
 
 --- 2025.4.0-vrtl.1 released at this time ---
 
