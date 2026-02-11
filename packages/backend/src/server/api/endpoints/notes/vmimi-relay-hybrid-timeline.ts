@@ -20,6 +20,8 @@ import { IdService } from '@/core/IdService.js';
 import { UserFollowingService } from '@/core/UserFollowingService.js';
 import { FanoutTimelineName } from '@/core/FanoutTimelineService.js';
 import { CacheService } from '@/core/CacheService.js';
+import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { ChannelFollowingService } from '@/core/ChannelFollowingService.js';
 import { ApiError } from '../../error.js';
 
 export const meta = {
@@ -85,6 +87,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private idService: IdService,
 		private vmimiRelayTimelineService: VmimiRelayTimelineService,
 		private userFollowingService: UserFollowingService,
+		private channelMutingService: ChannelMutingService,
+		private channelFollowingService: ChannelFollowingService,
 		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
 		private cacheService: CacheService,
 		private metaService: MetaService,
@@ -193,11 +197,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		withLocalOnly: boolean,
 	}, me: MiLocalUser) {
 		const followees = await this.userFollowingService.getFollowees(me.id);
-		const followingChannels = await this.channelFollowingsRepository.find({
-			where: {
-				followerId: me.id,
-			},
-		});
+
+		const mutingChannelIds = await this.channelMutingService
+			.list({ requestUserId: me.id }, { idOnly: true })
+			.then(x => x.map(x => x.id));
+		const followingChannelIds = await this.channelFollowingService
+			.list({ requestUserId: me.id }, { idOnly: true })
+			.then(x => x.map(x => x.id).filter(x => !mutingChannelIds.includes(x)));
+
 		const vmimiRelayInstances = this.vmimiRelayTimelineService.hostNames;
 
 		const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId)
@@ -235,15 +242,20 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			.leftJoinAndSelect('reply.user', 'replyUser')
 			.leftJoinAndSelect('renote.user', 'renoteUser');
 
-		if (followingChannels.length > 0) {
-			const followingChannelIds = followingChannels.map(x => x.followeeId);
-
+		if (followingChannelIds.length > 0) {
 			query.andWhere(new Brackets(qb => {
 				qb.where('note.channelId IN (:...followingChannelIds)', { followingChannelIds });
 				qb.orWhere('note.channelId IS NULL');
 			}));
 		} else {
 			query.andWhere('note.channelId IS NULL');
+		}
+
+		if (mutingChannelIds.length > 0) {
+			query.andWhere(new Brackets(qb => {
+				qb.orWhere('note.renoteChannelId IS NULL');
+				qb.orWhere('note.renoteChannelId NOT IN (:...mutingChannelIds)', { mutingChannelIds });
+			}));
 		}
 
 		if (!ps.withReplies) {

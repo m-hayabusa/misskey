@@ -4,6 +4,16 @@ VRTLのブランチで行われた変更点をまとめています
 
 <!-- VV Please add changelog here VV -->
 
+--- 2025.12.2-vrtl.1 released at this time ---
+
+
+--- 2025.12.1-vrtl.1 released at this time ---
+
+
+--- 2025.12.0-vrtl.1 released at this time ---
+
+- fix(backend): VSTLでチャンネルミュートが適用されない問題を修正 - 2025/11/30 #260
+
 --- 2025.11.1-vrtl.1 released at this time ---
 
 --- 2025.11.0-vrtl.1 released at this time ---
