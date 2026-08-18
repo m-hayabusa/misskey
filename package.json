@@ -1,6 +1,6 @@
 {
 	"name": "misskey",
-	"version": "2026.7.0-vrtl.1",
+	"version": "2026.7.0-mewl.0",
 	"codename": "nasubi",
 	"repository": {
 		"type": "git",
@@ -51,7 +51,10 @@
 		"test-and-coverage": "pnpm -r test-and-coverage",
 		"clean": "node scripts/clean.mjs",
 		"clean-all": "node scripts/clean-all.mjs",
-		"cleanall": "pnpm clean-all"
+		"cleanall": "pnpm clean-all",
+		"docker:publish": "pnpm docker:build && pnpm docker:push",
+		"docker:build": "docker build . -t mhayabusa/misskey:$(jq -r .version < package.json)",
+		"docker:push": "docker push mhayabusa/misskey:$(jq -r .version < package.json)"
 	},
 	"dependencies": {
 		"esbuild": "0.28.1",
