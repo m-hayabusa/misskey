@@ -113,7 +113,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<p v-if="appearNote.renoteCount > 0" :class="$style.noteFooterButtonCount">{{ (appearNote.renoteCount) }}</p>
 			</a>
 			<a :href="`/notes/${appearNote.id}`" target="_blank" rel="noopener" :class="[$style.noteFooterButton, $style.footerButtonLink]" class="_button">
-				<i v-if="appearNote.reactionAcceptance === 'likeOnly'" class="ti ti-heart"></i>
+				<i v-if="appearNote.reactionAcceptance === 'likeOnly'" class="ti ti-star"></i>
 				<i v-else class="ti ti-plus"></i>
 				<p v-if="(appearNote.reactionAcceptance === 'likeOnly') && appearNote.reactionCount > 0" :class="$style.noteFooterButtonCount">{{ (appearNote.reactionCount) }}</p>
 			</a>
@@ -129,6 +129,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, inject, ref } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
+import { shouldCollapsed } from '@@/js/collapsed.js';
+import { url } from '@@/js/config.js';
 import I18n from '@/components/I18n.vue';
 import EmMediaList from '@/components/EmMediaList.vue';
 import EmNoteSub from '@/components/EmNoteSub.vue';
@@ -145,8 +147,6 @@ import { userPage } from '@/utils.js';
 import { notePage } from '@/utils.js';
 import { i18n } from '@/i18n.js';
 import { DI } from '@/di.js';
-import { shouldCollapsed } from '@@/js/collapsed.js';
-import { url } from '@@/js/config.js';
 import EmMfm from '@/components/EmMfm.js';
 
 const props = defineProps<{

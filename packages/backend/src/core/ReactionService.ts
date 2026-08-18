@@ -31,7 +31,7 @@ import { isQuote, isRenote } from '@/misc/is-renote.js';
 import { ReactionsBufferingService } from '@/core/ReactionsBufferingService.js';
 import { PER_NOTE_REACTION_USER_PAIR_CACHE_MAX } from '@/const.js';
 
-const FALLBACK = '\u2764';
+const FALLBACK = '⭐';
 
 const legacies: Record<string, string> = {
 	'like': '👍',
@@ -125,7 +125,7 @@ export class ReactionService {
 		let reaction = _reaction ?? FALLBACK;
 
 		if (note.reactionAcceptance === 'likeOnly' || ((note.reactionAcceptance === 'likeOnlyForRemote' || note.reactionAcceptance === 'nonSensitiveOnlyForLocalLikeOnlyForRemote') && (user.host != null))) {
-			reaction = '\u2764';
+			reaction = '⭐';
 		} else if (_reaction != null) {
 			const custom = reaction.match(isCustomEmojiRegexp);
 			if (custom) {

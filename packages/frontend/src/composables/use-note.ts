@@ -4,14 +4,17 @@
  */
 
 import { ref, computed } from 'vue';
-import type { Ref } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
 import { isLink } from '@@/js/is-link.js';
 import { shouldCollapsed } from '@@/js/collapsed.js';
 import { host } from '@@/js/config.js';
-import { pleaseLogin } from '@/utility/please-login.js';
+import type { Ref } from 'vue';
 import type { OpenOnRemoteOptions } from '@/utility/please-login.js';
+import type { DI as DIType } from '@/di.js';
+import type { ExtractInjectedType } from '@/types/misc.js';
+import type { MenuItem } from '@/types/menu.js';
+import { pleaseLogin } from '@/utility/please-login.js';
 import { checkWordMute } from '@/utility/check-word-mute.js';
 import { misskeyApi, misskeyApiGet } from '@/utility/misskey-api.js';
 import * as sound from '@/utility/sound.js';
@@ -34,9 +37,6 @@ import MkUsersTooltip from '@/components/MkUsersTooltip.vue';
 import MkReactionsViewerDetails from '@/components/MkReactionsViewer.details.vue';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { notePage } from '@/filters/note.js';
-import type { DI as DIType } from '@/di.js';
-import type { ExtractInjectedType } from '@/types/misc.js';
-import type { MenuItem } from '@/types/menu.js';
 
 export interface UseNoteProps {
 	note: Misskey.entities.Note;
@@ -202,7 +202,7 @@ export function useNote(
 				if (users.length < 1 || els.reactButton!.value == null) return;
 				const { dispose } = os.popup(MkReactionsViewerDetails, {
 					showing,
-					reaction: '❤️',
+					reaction: '⭐',
 					users,
 					count: $appearNote.reactionCount,
 					anchorElement: els.reactButton!.value,
@@ -251,9 +251,9 @@ export function useNote(
 			if (props.mock) return;
 			misskeyApi('notes/reactions/create', {
 				noteId: appearNote.id,
-				reaction: '❤️',
+				reaction: '⭐',
 			}).then(() => {
-				noteEvents.emit(`reacted:${appearNote.id}`, { userId: $i!.id, reaction: '❤️' });
+				noteEvents.emit(`reacted:${appearNote.id}`, { userId: $i!.id, reaction: '⭐' });
 			});
 			if (els.reactButton != null && els.reactButton.value != null && prefer.s.animation) {
 				const rect = els.reactButton.value.getBoundingClientRect();

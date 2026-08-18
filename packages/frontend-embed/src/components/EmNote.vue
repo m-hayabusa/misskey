@@ -92,7 +92,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<i class="ti ti-repeat"></i>
 				</a>
 				<a :href="`/notes/${appearNote.id}`" target="_blank" rel="noopener" :class="[$style.footerButton, $style.footerButtonLink]" class="_button">
-					<i v-if="appearNote.reactionAcceptance === 'likeOnly'" class="ti ti-heart"></i>
+					<i v-if="appearNote.reactionAcceptance === 'likeOnly'" class="ti ti-star"></i>
 					<i v-else class="ti ti-plus"></i>
 				</a>
 				<a :href="`/notes/${appearNote.id}`" target="_blank" rel="noopener" :class="[$style.footerButton, $style.footerButtonLink]" class="_button">

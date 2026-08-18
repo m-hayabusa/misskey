@@ -170,9 +170,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<i class="ti ti-ban"></i>
 				</button>
 				<button ref="reactButton" :class="$style.noteFooterButton" class="_button" @click="toggleReact()">
-					<i v-if="appearNote.reactionAcceptance === 'likeOnly' && $appearNote.myReaction != null" class="ti ti-heart-filled" style="color: var(--MI_THEME-love);"></i>
+					<i v-if="appearNote.reactionAcceptance === 'likeOnly' && $appearNote.myReaction != null" class="ti ti-star-filled" style="color: var(--MI_THEME-star);"></i>
 					<i v-else-if="$appearNote.myReaction != null" class="ti ti-minus" style="color: var(--MI_THEME-accent);"></i>
-					<i v-else-if="appearNote.reactionAcceptance === 'likeOnly'" class="ti ti-heart"></i>
+					<i v-else-if="appearNote.reactionAcceptance === 'likeOnly'" class="ti ti-star"></i>
 					<i v-else class="ti ti-plus"></i>
 					<p v-if="(appearNote.reactionAcceptance === 'likeOnly' || prefer.s.showReactionsCount) && $appearNote.reactionCount > 0" :class="$style.noteFooterButtonCount">{{ number($appearNote.reactionCount) }}</p>
 				</button>
@@ -241,6 +241,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { inject, provide, ref, useTemplateRef, markRaw, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { Keymap } from '@/utility/hotkey.js';
 import { useNote } from '@/composables/use-note.js';
 import { prefer } from '@/preferences.js';
 import { i18n } from '@/i18n.js';
@@ -251,7 +252,6 @@ import { Paginator } from '@/utility/paginator.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import number from '@/filters/number.js';
 import { DI } from '@/di.js';
-import type { Keymap } from '@/utility/hotkey.js';
 
 // コンポーネント外部の依存関係
 import MkNoteSub from '@/components/MkNoteSub.vue';

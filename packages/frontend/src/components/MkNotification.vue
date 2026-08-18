@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.head">
 		<MkAvatar v-if="['pollEnded', 'note'].includes(notification.type) && 'note' in notification" :class="$style.icon" :user="notification.note.user" link preview/>
 		<MkAvatar v-else-if="['roleAssigned', 'achievementEarned', 'exportCompleted', 'login', 'createToken', 'scheduledNotePosted', 'scheduledNotePostFailed'].includes(notification.type)" :class="$style.icon" :user="$i" link preview/>
-		<div v-else-if="notification.type === 'reaction:grouped' && notification.note.reactionAcceptance === 'likeOnly'" :class="[$style.icon, $style.icon_reactionGroupHeart]"><i class="ti ti-heart" style="line-height: 1;"></i></div>
+		<div v-else-if="notification.type === 'reaction:grouped' && notification.note.reactionAcceptance === 'likeOnly'" :class="[$style.icon, $style.icon_reactionGroupHeart]"><i class="ti ti-star" style="line-height: 1;"></i></div>
 		<div v-else-if="notification.type === 'reaction:grouped'" :class="[$style.icon, $style.icon_reactionGroup]"><i class="ti ti-plus" style="line-height: 1;"></i></div>
 		<div v-else-if="notification.type === 'renote:grouped'" :class="[$style.icon, $style.icon_renoteGroup]"><i class="ti ti-repeat" style="line-height: 1;"></i></div>
 		<MkAvatar v-else-if="'user' in notification" :class="$style.icon" :user="notification.user" link preview/>
@@ -247,7 +247,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	--eventFollow: #36aed2;
 	--eventRenote: #36d298;
 	--eventReply: #007aff;
-	--eventReactionHeart: var(--MI_THEME-love);
+	--eventReactionStar: var(--MI_THEME-star);
 	--eventReaction: #e99a0b;
 	--eventAchievement: #cb9a11;
 	--eventLogin: #007aff;
@@ -287,7 +287,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 }
 
 .icon_reactionGroupHeart {
-	background: var(--eventReactionHeart);
+	background: var(--eventReactionStar);
 }
 
 .icon_renoteGroup {

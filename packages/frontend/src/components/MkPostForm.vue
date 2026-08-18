@@ -614,12 +614,12 @@ function showOtherSettings() {
 
 	switch (reactionAcceptance.value) {
 		case 'likeOnly':
-			reactionAcceptanceIcon = 'ti ti-heart _love';
+			reactionAcceptanceIcon = 'ti ti-star _star';
 			reactionAcceptanceCaption = i18n.ts.likeOnly;
 			break;
 
 		case 'likeOnlyForRemote':
-			reactionAcceptanceIcon = 'ti ti-heart-plus';
+			reactionAcceptanceIcon = 'ti ti-star-plus';
 			reactionAcceptanceCaption = i18n.ts.likeOnlyForRemote;
 			break;
 
