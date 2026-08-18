@@ -73,6 +73,8 @@ export class ClientServerService {
 	private readonly swAssets: string;
 	private readonly fluentEmojiDir: string;
 	private readonly twemojiDir: string;
+	private readonly notoEmojiDir: string;
+	private readonly blobmojiDir: string;
 	private readonly frontendViteOut: string;
 	private readonly frontendEmbedViteOut: string;
 	private readonly tarball: string;
@@ -137,6 +139,8 @@ export class ClientServerService {
 		this.swAssets = resolve(this.config.rootDir, 'built/_sw_dist_');
 		this.fluentEmojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/fluent-emoji');
 		this.twemojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/twemoji');
+		this.notoEmojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/noto-emoji');
+		this.blobmojiDir = resolve(backendRootdir, 'node_modules/@misskey-dev/emoji-assets/built/blobmoji');
 		this.frontendViteOut = resolve(this.config.rootDir, 'built/_frontend_vite_');
 		this.frontendEmbedViteOut = resolve(this.config.rootDir, 'built/_frontend_embed_vite_');
 		this.tarball = resolve(this.config.rootDir, 'built/tarball');
@@ -322,6 +326,36 @@ export class ClientServerService {
 			reply.header('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'');
 
 			return reply.sendFile(path, this.twemojiDir, {
+				maxAge: ms('30 days'),
+			});
+		});
+
+		fastify.get<{ Params: { path: string } }>('/noto-emoji/:path(.*)', async (request, reply) => {
+			const path = request.params.path;
+
+			if (!path.match(/^[0-9a-f-]+\.svg$/)) {
+				reply.code(404);
+				return;
+			}
+
+			reply.header('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'');
+
+			return reply.sendFile(path, this.notoEmojiDir, {
+				maxAge: ms('30 days'),
+			});
+		});
+
+		fastify.get<{ Params: { path: string } }>('/blobmoji/:path(.*)', async (request, reply) => {
+			const path = request.params.path;
+
+			if (!path.match(/^[0-9a-f-]+\.svg$/)) {
+				reply.code(404);
+				return;
+			}
+
+			reply.header('Content-Security-Policy', 'default-src \'none\'; style-src \'unsafe-inline\'');
+
+			return reply.sendFile(path, this.blobmojiDir, {
 				maxAge: ms('30 days'),
 			});
 		});

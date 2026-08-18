@@ -24,7 +24,7 @@
 		"vue": "3.5.39"
 	},
 	"devDependencies": {
-		"@misskey-dev/emoji-assets": "17.0.3",
+		"@misskey-dev/emoji-assets": "file:../../vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz",
 		"@misskey-dev/summaly": "5.5.1",
 		"@rollup/plugin-json": "6.1.0",
 		"@rollup/pluginutils": "5.4.0",

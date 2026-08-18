@@ -195,8 +195,8 @@ importers:
         specifier: 4.2.13
         version: 4.2.13
       '@misskey-dev/emoji-assets':
-        specifier: 17.0.3
-        version: 17.0.3
+        specifier: file:../../vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz
+        version: file:vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz
       '@misskey-dev/emoji-data':
         specifier: 17.0.3
         version: 17.0.3
@@ -789,8 +789,8 @@ importers:
         version: 5.3.1
     devDependencies:
       '@misskey-dev/emoji-assets':
-        specifier: 17.0.3
-        version: 17.0.3
+        specifier: file:../../vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz
+        version: file:vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz
       '@misskey-dev/summaly':
         specifier: 5.5.1
         version: 5.5.1
@@ -1079,8 +1079,8 @@ importers:
         version: 3.5.39(typescript@6.0.2)
     devDependencies:
       '@misskey-dev/emoji-assets':
-        specifier: 17.0.3
-        version: 17.0.3
+        specifier: file:../../vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz
+        version: file:vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz
       '@misskey-dev/summaly':
         specifier: 5.5.1
         version: 5.5.1
@@ -2392,8 +2392,9 @@ packages:
   '@misskey-dev/browser-image-resizer@2024.1.0':
     resolution: {integrity: sha512-4EnO0zLW5NDtng3Gaz5MuT761uiuoOuplwX18wBqgj8w56LTU5BjLn/vbHwDIIe0j2gwqDYhMb7bDjmr1/Fomg==}
 
-  '@misskey-dev/emoji-assets@17.0.3':
-    resolution: {integrity: sha512-Uiy+R4rghBML5k2nZFLr2w4RUwqDrDnTWZ6lXGYtnEr0DRcW41pQyS2RUUm/pFjYr/DjNntcoysdhqinpa9P/Q==}
+  '@misskey-dev/emoji-assets@file:vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz':
+    resolution: {integrity: sha512-SScFTLmaTBkP+EJtTVlPNWTFRblI1ram3od0xlIRDbZA9VW8d9j39m4OF+N5nLI5K/AqTCxH38yX4EidaNF/5g==, tarball: file:vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz}
+    version: 17.0.6-mewl.0
 
   '@misskey-dev/emoji-data@17.0.0':
     resolution: {integrity: sha512-grMnsmTm7VSah5heS1fIfOfoQmIpzo6ZU5AV5yRxCy7ivtWhFU3fpMfXZyKsH9G9/HZiLRsClKtyjHKMlxjt7g==}
@@ -10366,7 +10367,7 @@ snapshots:
 
   '@misskey-dev/browser-image-resizer@2024.1.0': {}
 
-  '@misskey-dev/emoji-assets@17.0.3': {}
+  '@misskey-dev/emoji-assets@file:vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz': {}
 
   '@misskey-dev/emoji-data@17.0.0': {}
 

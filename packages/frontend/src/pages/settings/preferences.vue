@@ -122,7 +122,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</SearchMarker>
 						</div>
 
-						<SearchMarker :keywords="['emoji', 'style', 'native', 'system', 'fluent', 'twemoji']">
+						<SearchMarker :keywords="['emoji', 'style', 'native', 'system', 'fluent', 'twemoji', 'notoEmoji', 'blobmoji']">
 							<MkPreferenceContainer k="emojiStyle">
 								<div>
 									<MkRadios
@@ -131,6 +131,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 											{ value: 'native', label: i18n.ts.native },
 											{ value: 'fluentEmoji', label: 'Fluent Emoji' },
 											{ value: 'twemoji', label: 'Twemoji' },
+											{ value: 'notoEmoji', label: 'Noto Emoji' },
+											{ value: 'blobmoji', label: 'Blobmoji' },
 										]"
 									>
 										<template #label><SearchLabel>{{ i18n.ts.emojiStyle }}</SearchLabel></template>

@@ -169,6 +169,8 @@ export function getConfig(): UserConfig {
 				'/client-assets/': __dirname + '/assets/',
 				'/static-assets/': __dirname + '/../backend/assets/',
 				'/fluent-emoji/': '@misskey-dev/emoji-assets/fluent-emoji/',
+				'/noto-emoji/': '@misskey-dev/emoji-assets/noto-emoji/',
+				'/blobmoji/': '@misskey-dev/emoji-assets/blobmoji/',
 			},
 		},
 

@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, inject } from 'vue';
 import { colorizeEmoji, getEmojiName } from '@@/js/emojilist.js';
-import { char2fluentEmojiFilePath, char2twemojiFilePath } from '@@/js/emoji-base.js';
+import { emojiStyle2char2FilePath } from '@@/js/emoji-base.js';
 import type { MenuItem } from '@/types/menu.js';
 import * as os from '@/os.js';
 import { copyToClipboard } from '@/utility/copy-to-clipboard.js';
@@ -31,7 +31,7 @@ const props = defineProps<{
 
 const react = inject(DI.mfmEmojiReactCallback, null);
 
-const char2path = prefer.s.emojiStyle === 'twemoji' ? char2twemojiFilePath : char2fluentEmojiFilePath;
+const char2path = emojiStyle2char2FilePath(prefer.s.emojiStyle);
 
 const useOsNativeEmojis = computed(() => prefer.s.emojiStyle === 'native');
 const url = computed(() => char2path(props.emoji));

@@ -238,7 +238,7 @@ export const PREF_DEF = definePreferences({
 		default: false,
 	},
 	emojiStyle: {
-		default: 'twemoji' as 'native' | 'fluentEmoji' | 'twemoji',
+		default: 'blobmoji' as 'native' | 'fluentEmoji' | 'twemoji' | 'notoEmoji' | 'blobmoji',
 	},
 	menuStyle: {
 		default: 'auto' as 'auto' | 'popup' | 'drawer',

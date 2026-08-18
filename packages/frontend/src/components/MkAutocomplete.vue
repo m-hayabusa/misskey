@@ -48,7 +48,7 @@ import { markRaw, ref, useTemplateRef, computed, onUpdated, onMounted, onBeforeU
 import * as Misskey from 'misskey-js';
 import sanitizeHtml from 'sanitize-html';
 import { emojilist, getEmojiName } from '@@/js/emojilist.js';
-import { char2twemojiFilePath, char2fluentEmojiFilePath } from '@@/js/emoji-base.js';
+import { emojiStyle2char2FilePath } from '@@/js/emoji-base.js';
 import { MFM_TAGS, MFM_PARAMS } from '@@/js/const.js';
 import type { EmojiDef } from '@/utility/search-emoji.js';
 import { elementContains } from '@/utility/element-contains.js';
@@ -98,7 +98,7 @@ const lib = emojilist.filter(x => x.category !== 'flags');
 
 const unicodeEmojiDB = computed(() => {
 	//#region Unicode Emoji
-	const char2path = prefer.r.emojiStyle.value === 'twemoji' ? char2twemojiFilePath : char2fluentEmojiFilePath;
+	const char2path = emojiStyle2char2FilePath(prefer.r.emojiStyle.value);
 
 	const unicodeEmojiDB: EmojiDef[] = lib.map(x => ({
 		emoji: x.char,

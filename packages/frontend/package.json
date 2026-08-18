@@ -71,7 +71,7 @@
 		"wanakana": "5.3.1"
 	},
 	"devDependencies": {
-		"@misskey-dev/emoji-assets": "17.0.3",
+		"@misskey-dev/emoji-assets": "file:../../vendor/misskey-dev-emoji-assets-17.0.6-mewl.0.tgz",
 		"@misskey-dev/summaly": "5.5.1",
 		"@playwright/test": "1.61.1",
 		"@rollup/plugin-json": "6.1.0",
