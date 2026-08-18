@@ -28,7 +28,7 @@ services:
 
   db:
     restart: unless-stopped
-    image: postgres:18-alpine
+    image: groonga/pgroonga:latest
     networks:
       - internal_network
     environment:

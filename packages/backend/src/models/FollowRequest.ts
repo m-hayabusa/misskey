@@ -40,7 +40,7 @@ export class MiFollowRequest {
 	public follower: MiUser | null;
 
 	@Column('varchar', {
-		length: 128, nullable: true,
+		length: 256, nullable: true,
 		comment: 'id of Follow Activity.',
 	})
 	public requestId: string | null;
