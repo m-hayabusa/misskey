@@ -60,6 +60,14 @@ export class IdService {
 
 	@bindThis
 	public parse(id: string): { date: Date; } {
+		if (this.config.url === 'https://mewl.me') {
+			const date = parseMeid(id);
+			if (date.date.getFullYear() < 750) {
+				return parseObjectId(id);
+			} else {
+				return date;
+			}
+		}
 		switch (this.method) {
 			case 'aid': return parseAid(id);
 			case 'aidx': return parseAidx(id);
