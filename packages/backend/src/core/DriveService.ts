@@ -588,6 +588,8 @@ export class DriveService {
 			properties['orientation'] = info.orientation;
 		}
 
+		const description = comment ?? info.description ?? null;
+
 		const profile = user ? await this.userProfilesRepository.findOneBy({ userId: user.id }) : null;
 
 		const folder = await fetchFolder();
@@ -597,7 +599,7 @@ export class DriveService {
 		file.userId = user ? user.id : null;
 		file.userHost = user ? user.host : null;
 		file.folderId = folder !== null ? folder.id : null;
-		file.comment = comment;
+		file.comment = description;
 		file.properties = properties;
 		file.blurhash = info.blurhash ?? null;
 		file.isLink = isLink;

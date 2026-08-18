@@ -87,6 +87,7 @@
 		"content-disposition": "2.0.1",
 		"date-fns": "4.4.0",
 		"deep-email-validator": "0.1.27",
+		"exifreader": "4.41.0",
 		"fastify": "5.10.0",
 		"fastify-raw-body": "5.0.0",
 		"feed": "6.0.0",

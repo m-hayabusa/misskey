@@ -15,6 +15,8 @@ import isSvg from 'is-svg';
 import probeImageSize from 'probe-image-size';
 import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import * as blurhash from 'blurhash';
+import ExifReader from 'exifreader';
+import { DB_MAX_IMAGE_COMMENT_LENGTH } from '@/const.js';
 import { createTempDir } from '@/misc/create-temp.js';
 import { AiService } from '@/core/AiService.js';
 import { LoggerService } from '@/core/LoggerService.js';
@@ -33,6 +35,7 @@ export type FileInfo = {
 	width?: number;
 	height?: number;
 	orientation?: number;
+	description?: string;
 	blurhash?: string;
 	sensitive: boolean;
 	porn: boolean;
@@ -156,6 +159,26 @@ export class FileInfoService {
 			});
 		}
 
+		let description: string | undefined;
+		if ([
+			'image/jpeg',
+			'image/png',
+			'image/apng',
+			'image/webp',
+			'image/avif',
+			'image/heic',
+			'image/heif',
+		].includes(type.mime)) {
+			description = await this.getDescription(path);
+			if (description) {
+				description = description.trim();
+				if (description.length >= DB_MAX_IMAGE_COMMENT_LENGTH) {
+					description.slice(0, DB_MAX_IMAGE_COMMENT_LENGTH - 3);
+					description += '...';
+				}
+			}
+		}
+
 		let sensitive = false;
 		let porn = false;
 
@@ -181,6 +204,7 @@ export class FileInfoService {
 			height,
 			orientation,
 			blurhash,
+			description,
 			sensitive,
 			porn,
 			warnings,
@@ -392,7 +416,7 @@ export class FileInfoService {
 		mime: string;
 		ext: string | null;
 	}> {
-	// Check 0 byte
+		// Check 0 byte
 		const fileSize = await this.getFileSize(path);
 		if (fileSize === 0) {
 			return TYPE_OCTET_STREAM;
@@ -401,7 +425,7 @@ export class FileInfoService {
 		const type = await fileType.fileTypeFromFile(path);
 
 		if (type) {
-		// XMLはSVGかもしれない
+			// XMLはSVGかもしれない
 			if (type.mime === 'application/xml' && await this.checkSvg(path)) {
 				return TYPE_SVG;
 			}
@@ -497,5 +521,19 @@ export class FileInfoService {
 			.resize(64, 64, { fit: 'inside' })
 			.toBuffer({ resolveWithObject: true });
 		return blurhash.encode(new Uint8ClampedArray(buffer), info.width, info.height, 5, 5);
+	}
+
+	/**
+ * Get ImageDescription
+ */
+	@bindThis
+	private async getDescription(path: string): Promise<string | undefined> {
+		try {
+			const result = await ExifReader.load(path);
+			return result.ImageDescription?.description;
+		} catch (e) {
+			this.logger.warn(`Failed to read EXIF data from image: ${path}`, e as Error);
+			return undefined;
+		}
 	}
 }

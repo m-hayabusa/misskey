@@ -53,6 +53,16 @@ const VIDEO_PREPROCESS_NEEDED_TYPES = [
 	...VIDEO_COMPRESSION_SUPPORTED_TYPES,
 ];
 
+const IMAGE_EXIF_DESCRIPTION_SUPPORTED_TYPES = [
+	'image/jpeg',
+	'image/png',
+	'image/apng',
+	'image/webp',
+	'image/avif',
+	'image/heic',
+	'image/heif',
+];
+
 const mimeTypeMap = {
 	'image/webp': 'webp',
 	'image/jpeg': 'jpg',
@@ -688,10 +698,14 @@ export function useUploader(options: {
 		}
 
 		const needsImageFrame = item.imageFrameParams != null && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type);
+		const needsImageDescription = IMAGE_EXIF_DESCRIPTION_SUPPORTED_TYPES.includes(preprocessedFile.type) && (!item.caption?.trim());
+
+		if (needsImageFrame || needsImageDescription) {
+			const ExifReader = await import('exifreader');
+			const exif = ExifReader.load(await item.file.arrayBuffer());
+
 		if (needsImageFrame && item.imageFrameParams != null) {
 			const canvas = window.document.createElement('canvas');
-			const ExifReader = await import('exifreader');
-			const exif = await ExifReader.load(await item.file.arrayBuffer());
 			const ImageFrameRenderer = await import('@/utility/image-frame-renderer/ImageFrameRenderer.js').then(x => x.ImageFrameRenderer);
 			const frameRenderer = new ImageFrameRenderer({
 				canvas: canvas,
@@ -712,6 +726,11 @@ export function useUploader(options: {
 					frameRenderer.destroy();
 				}, 'image/png');
 			});
+			}
+
+			if (needsImageDescription) {
+				item.caption = exif.ImageDescription?.description.trim() ?? null;
+			}
 		}
 
 		const compressionSettings = getCompressionSettings(item.compressionLevel);
