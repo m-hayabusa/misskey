@@ -1,0 +1,223 @@
+name: Build, E2E and Push Mewl Misskey Docker Image
+
+on:
+  push:
+    tags:
+      - '*-mewl.*'
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag override (defaults to package.json version)'
+        required: false
+        default: ''
+      push_image:
+        description: 'Push image to Gitea Container Registry'
+        required: false
+        default: 'true'
+
+env:
+  REGISTRY: gitea.hs-sh.net
+  REGISTRY_IMAGE: gitea.hs-sh.net/misskey/misskey
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Resolve version and image tag
+        run: |
+          PKG_VERSION=$(node -e "console.log(require('./package.json').version)")
+          IMAGE_TAG="${{ inputs.image_tag }}"
+          if [ -z "$IMAGE_TAG" ]; then
+            IMAGE_TAG="$PKG_VERSION"
+          fi
+          echo "EXPECTED_VERSION=$PKG_VERSION" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+          echo "PKG_VERSION=$PKG_VERSION, IMAGE_TAG=$IMAGE_TAG"
+
+      - name: Resolve emoji-assets cache key
+        id: emoji-key
+        run: |
+          EXPECTED_TGZ=$(node -e "const p=require('./packages/frontend/package.json'); const v=(p.devDependencies && p.devDependencies['@misskey-dev/emoji-assets']) || ''; console.log(v.replace(/^file:.*\/vendor\//, ''))")
+          EMOJI_SHA=$(git ls-remote https://github.com/m-hayabusa/misskey-emojis.git HEAD | awk '{print $1}')
+          echo "tgz=${EXPECTED_TGZ}" >> "$GITHUB_OUTPUT"
+          echo "sha=${EMOJI_SHA}" >> "$GITHUB_OUTPUT"
+          echo "EXPECTED_TGZ=${EXPECTED_TGZ}" >> "$GITHUB_ENV"
+          echo "Expected emoji-assets tarball: $EXPECTED_TGZ (upstream HEAD: $EMOJI_SHA)"
+
+      - name: Restore vendor emoji-assets tarball cache
+        id: emoji-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: vendor/misskey-dev-emoji-assets-*.tgz
+          key: misskey-emojis-${{ steps.emoji-key.outputs.tgz }}-${{ steps.emoji-key.outputs.sha }}
+
+      - name: Build and pack misskey-emojis
+        if: steps.emoji-cache.outputs.cache-hit != 'true'
+        run: |
+          if ! command -v pnpm >/dev/null 2>&1; then
+            corepack enable || npm install -g pnpm
+          fi
+          rm -rf /tmp/misskey-emojis
+          git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/m-hayabusa/misskey-emojis.git /tmp/misskey-emojis
+          cd /tmp/misskey-emojis
+          pnpm install --frozen-lockfile || pnpm install
+          pnpm build
+          pnpm --filter @misskey-dev/emoji-assets pack
+          cd - >/dev/null
+          cp /tmp/misskey-emojis/misskey-dev-emoji-assets-*.tgz vendor/ 2>/dev/null || cp /tmp/misskey-emojis/packages/*/misskey-dev-emoji-assets-*.tgz vendor/ 2>/dev/null || find /tmp/misskey-emojis -name 'misskey-dev-emoji-assets-*.tgz' -exec cp {} vendor/ \;
+
+      - name: Save vendor emoji-assets tarball cache
+        if: steps.emoji-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v3
+        with:
+          path: vendor/misskey-dev-emoji-assets-*.tgz
+          key: misskey-emojis-${{ steps.emoji-key.outputs.tgz }}-${{ steps.emoji-key.outputs.sha }}
+
+      - name: Verify vendor emoji-assets tarball
+        run: |
+          ls -lh vendor/
+          if [ -n "$EXPECTED_TGZ" ] && [ ! -f "vendor/${EXPECTED_TGZ}" ]; then
+            echo "::error::Expected vendor/${EXPECTED_TGZ} not found"
+            exit 1
+          fi
+
+      - name: Build Docker image (linux/amd64)
+        run: |
+          START_TS=$(date +%s)
+          DOCKER_BUILDKIT=1 docker build \
+            --platform linux/amd64 \
+            --build-arg NODE_OPTIONS=--max-old-space-size=6144 \
+            -t "misskey-e2e:${GITHUB_RUN_ID}" \
+            .
+          END_TS=$(date +%s)
+          echo "Docker build finished in $((END_TS - START_TS))s"
+          docker images "misskey-e2e:${GITHUB_RUN_ID}"
+
+      - name: Run Playwright E2E against PGroonga + Redis
+        run: |
+          NET="e2e-net-${GITHUB_RUN_ID}"
+          PG_NAME="e2e-pgroonga-${GITHUB_RUN_ID}"
+          RD_NAME="e2e-redis-${GITHUB_RUN_ID}"
+          MK_NAME="e2e-misskey-${GITHUB_RUN_ID}"
+          PW_NAME="e2e-pw-${GITHUB_RUN_ID}"
+
+          docker network create "$NET"
+
+          docker run -d --name "$PG_NAME" \
+            --network "$NET" --network-alias pgroonga \
+            -e POSTGRES_DB=misskey \
+            -e POSTGRES_USER=misskey \
+            -e POSTGRES_PASSWORD=misskey \
+            groonga/pgroonga:latest-debian-16
+
+          docker run -d --name "$RD_NAME" \
+            --network "$NET" --network-alias redis \
+            redis:7-alpine
+
+          for i in $(seq 1 30); do
+            if docker exec "$PG_NAME" pg_isready -U misskey -d misskey >/dev/null 2>&1 && \
+               docker exec "$RD_NAME" redis-cli ping | grep -q PONG; then
+              break
+            fi
+            sleep 2
+          done
+
+          mkdir -p /tmp/e2e-config
+          cat > /tmp/e2e-config/default.yml << 'EOF'
+          url: http://misskey:3000/
+          port: 3000
+          db:
+            host: pgroonga
+            port: 5432
+            db: misskey
+            user: misskey
+            pass: misskey
+          redis:
+            host: redis
+            port: 6379
+          fulltextSearch:
+            provider: sqlPgroonga
+          id: 'aidx'
+          EOF
+          chmod 755 /tmp/e2e-config
+          chmod 644 /tmp/e2e-config/default.yml
+
+          docker create --name "$MK_NAME" \
+            --network "$NET" --network-alias misskey \
+            -e COREPACK_INTEGRITY_KEYS=0 \
+            "misskey-e2e:${GITHUB_RUN_ID}"
+          docker cp /tmp/e2e-config "${MK_NAME}:/misskey/.config"
+          docker start "$MK_NAME"
+
+          echo "Waiting for Misskey container healthcheck..."
+          HEALTHY=0
+          for i in $(seq 1 60); do
+            STATUS=$(docker inspect -f '{{.State.Health.Status}}' "$MK_NAME" 2>/dev/null || echo "starting")
+            RUNNING=$(docker inspect -f '{{.State.Running}}' "$MK_NAME" 2>/dev/null || echo "false")
+            if [ "$STATUS" = "healthy" ]; then
+              HEALTHY=1
+              break
+            fi
+            if [ "$RUNNING" = "false" ]; then
+              echo "::error::Misskey container exited unexpectedly"
+              docker logs --tail 200 "$MK_NAME"
+              exit 1
+            fi
+            sleep 3
+          done
+          if [ "$HEALTHY" != "1" ]; then
+            echo "::error::Misskey container failed to become healthy within timeout"
+            docker logs --tail 200 "$MK_NAME"
+            exit 1
+          fi
+
+          docker create --name "$PW_NAME" \
+            --network "$NET" \
+            -e MISSKEY_URL=http://misskey:3000 \
+            -e EXPECTED_VERSION="$EXPECTED_VERSION" \
+            mcr.microsoft.com/playwright:v1.52.0-noble \
+            sh -c "cd /e2e-mewl && npm install --no-save playwright-core@1.52.0 && node run-e2e.mjs"
+          docker cp e2e-mewl "${PW_NAME}:/e2e-mewl"
+
+          set +e
+          docker start -a "$PW_NAME"
+          PW_RC=$?
+          set -e
+
+          if [ "$PW_RC" -ne 0 ]; then
+            mkdir -p ./e2e-artifacts
+            docker cp "${PW_NAME}:/e2e-mewl/artifacts/." ./e2e-artifacts/ 2>/dev/null || true
+            echo "=== Misskey container logs (tail 150) ==="
+            docker logs --tail 150 "$MK_NAME" || true
+            exit "$PW_RC"
+          fi
+
+      - name: Upload E2E artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-failure-artifacts
+          path: ./e2e-artifacts
+
+      - name: Push image to Gitea Container Registry
+        if: success() && (github.event_name != 'workflow_dispatch' || inputs.push_image == 'true')
+        run: |
+          echo "${{ secrets.REGISTRY_TOKEN }}" | docker login "${{ env.REGISTRY }}" -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+          docker tag "misskey-e2e:${GITHUB_RUN_ID}" "${{ env.REGISTRY_IMAGE }}:${{ env.IMAGE_TAG }}"
+          docker push "${{ env.REGISTRY_IMAGE }}:${{ env.IMAGE_TAG }}"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            docker tag "misskey-e2e:${GITHUB_RUN_ID}" "${{ env.REGISTRY_IMAGE }}:latest"
+            docker push "${{ env.REGISTRY_IMAGE }}:latest"
+          fi
+
+      - name: Cleanup E2E containers and network
+        if: always()
+        run: |
+          docker logout "${{ env.REGISTRY }}" 2>/dev/null || true
+          docker rm -f "e2e-pw-${GITHUB_RUN_ID}" "e2e-misskey-${GITHUB_RUN_ID}" "e2e-pgroonga-${GITHUB_RUN_ID}" "e2e-redis-${GITHUB_RUN_ID}" 2>/dev/null || true
+          docker network rm "e2e-net-${GITHUB_RUN_ID}" 2>/dev/null || true
+          docker rmi "misskey-e2e:${GITHUB_RUN_ID}" 2>/dev/null || true
+          docker builder prune --keep-storage=6GB -f >/dev/null 2>&1 || true
